@@ -22,7 +22,7 @@ $\theta_0,\theta_1...,\theta_n$
 
 #### Cost function:
 {% raw %}
-$J(\theta) = \frac 1 {2m} \sum_{i=1}^m (h_\theta(x^{(i)}-y^{(i)})^2$
+$J(\theta) = \frac 1 {2m} \sum_{i=1}^m (h_\theta(x^{(i)})-y^{(i)})^2$
 {% endraw %}
 #### Gradient descent:
 Repeat{
@@ -37,7 +37,7 @@ To make features have approximately zero mean.
 
 $x_i = \frac {x_i - \mu_i} {s_i}$
 
-$\mu_i$ is the average value of x_i in traning set
+$\mu_i$ is the average value of $x_i$ in traning set
 $s_i$ is the range (max-min)  or (standard deviation)
 
 #### Learning rate:
