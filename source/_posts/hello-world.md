@@ -1,5 +1,6 @@
 ---
 title: Hexo 搭建的blog
+date: 2017-07-28 21:25:35
 ---
 
 之前用的Jekyll搭建静态blog，现在换成Hexo. 重温了一下mark down的语法
