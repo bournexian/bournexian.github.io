@@ -1,5 +1,5 @@
 ---
-title: machinelearning-wekk4
+title: machinelearning-week4
 date: 2017-09-05 22:29:52
 tags: machinelearning
 mathjax: true
