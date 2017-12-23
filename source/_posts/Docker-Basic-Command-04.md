@@ -4,7 +4,7 @@ date: 2017-12-22 15:48:13
 tags: docker
 ---
 
-### DOCKER BASIC COMMAND 04
+### DOCKER BASIC COMMAND -- Bind Mount & Tmpfs
 
 除了常用的volume外，还有bind mounts以及tmpfs两种方式存储数据； 在concepts那篇文章简单介绍过，bind mount类似于link，把host主机的目录挂载到container内， 而tmpfs则存储在内存中，用于存放临时数据。 下面直接试试用法。
 

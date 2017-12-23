@@ -4,7 +4,7 @@ date: 2017-12-10 21:03:41
 tags: docker
 ---
 
-### DOCKER BASIC COMMAND
+### DOCKER BASIC COMMAND -- container & images
 
 #### Prerequisites
 * Docker for Windows installed 

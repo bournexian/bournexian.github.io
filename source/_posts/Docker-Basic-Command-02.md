@@ -4,7 +4,7 @@ date: 2017-12-12 22:46:59
 tags: docker
 ---
 
-### DOCKER BASIC COMMAND 02
+### DOCKER BASIC COMMAND -- Dockerfile & build image
 
 上篇文章讲了一下基础的命令，这篇将继续围绕镜像展开。
 NOTE: Win 环境下要切换container模式为Linux
