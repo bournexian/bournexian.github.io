@@ -86,7 +86,7 @@ docker-compose文件的官网例子：
 
 #### Conclusion
 
-这篇主要围绕docker-compose.yml展开，也涉及了swarm初步的使用，下节将会时间下使用swarm创建集群。
+这篇主要围绕docker-compose.yml展开，也涉及了swarm初步的使用，下节将会试下使用swarm创建集群。
 
 
 
