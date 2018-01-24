@@ -34,7 +34,7 @@ tags: Javascript
 
 假如访问一个属性(举个例子使用代码o.d访问属性名d)，在原型链搜索完后仍未找到，则会返回undefined。
 
-> NOTE: 假如不想访问原型链上面的属性，只访问定义在当前对象的属性，可以使用hasOwnProperty方法，该方法定义在Object.prototype上而默认对象原型会从那里继承，故一般可以直接使用. 下面是一个使用hasOwnProperty的遍历当前对象可枚举属性的例子：
+> NOTE: 假如不想访问原型链上面的属性，只访问定义在当前对象的属性，可以使用hasOwnProperty方法或getOwnPropertyNames方法。 hasOwnProperty方法定义在Object.prototype上而默认对象原型会从那里继承，故一般可以直接使用. 下面是一个使用hasOwnProperty的遍历当前对象可枚举属性的例子 以及 使用getOwnPropertyNames的例子：
 ```javascript
     for (var property in obj) //for...in loop only iterate the enumerable items
     {
@@ -43,7 +43,12 @@ tags: Javascript
             //properities defined under obj directly
         }
     }
+
+    //sample 2 get own peroperties by 'getOwnPropertyNames' function
+    Object.getOwnPropertyNames(obj)
+    //The Object.getOwnPropertyNames() method returns an array of all properties (including non-enumerable properties except for those which use Symbol) found directly upon a given object.
 ```
+
 
 #### Inheriting "methods"
 
