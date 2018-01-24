@@ -16,7 +16,7 @@ tags: Javascript
 
 在Javascript中是如何实现继承的呢？ 答案是通过prototype（原型）。
 
-#### Prototype Chain & nheriting properties
+#### Prototype Chain & Inheriting properties
 
 和Java或者C#等语言基于类继承不同，Javascript是基于prototype（原型）来实现继承的。
 每个对象都拥有一个私有属性来保存一个连接到另一个对象，这里面的“另一个对象”就是当前对象的原型。  而那个原型对象本身也是对象，也有它自己的原型，所以就会形成一个原型链，知道最后原型是null结束。
@@ -34,6 +34,16 @@ tags: Javascript
 
 假如访问一个属性(举个例子使用代码o.d访问属性名d)，在原型链搜索完后仍未找到，则会返回undefined。
 
+> NOTE: 假如不想访问原型链上面的属性，只访问定义在当前对象的属性，可以使用hasOwnProperty方法，该方法定义在Object.prototype上而默认对象原型会从那里继承，故一般可以直接使用. 下面是一个使用hasOwnProperty的遍历当前对象可枚举属性的例子：
+```javascript
+    for (var property in obj) //for...in loop only iterate the enumerable items
+    {
+        if (obj.hasOwnProperty(property))
+        {
+            //properities defined under obj directly
+        }
+    }
+```
 
 #### Inheriting "methods"
 
