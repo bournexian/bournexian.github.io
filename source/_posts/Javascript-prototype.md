@@ -8,6 +8,13 @@ tags: Javascript
 
 捣鼓过Docker之后，接着开个坑，打算跟着cnblog上面一些文章和MDN的参考资料学习下JS或者说前端方面，这里是第一篇：JS原型。
 
+### References:
+[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain)
+
+[http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html](http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html)
+
+[http://www.xiaojichao.com/post/jscorev2.html](http://www.xiaojichao.com/post/jscorev2.html)
+
 #### Inheritance
 
 为什么需要继承？ 
@@ -154,10 +161,3 @@ ES2015支持了新的关键字，class，constructor，static，extends，super�
 
     var square = new Square(2);
 ```
-
-### References:
-[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain)
-
-[http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html](http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html)
-
-[http://www.xiaojichao.com/post/jscorev2.html](http://www.xiaojichao.com/post/jscorev2.html)
