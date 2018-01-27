@@ -157,7 +157,10 @@ ECStack.pop()
 ### Variable/Activation Object (ES3) || Variable Environment (ES5)
 TBD
 
-### Scope Chain/ Lexical
+### Scope Chain/ Lexical Environment
+TBD
+
+### Closures
 TBD
 
 ### This
