@@ -113,7 +113,7 @@ ECStack.push(evalContext, callingContext: <foo> functionContext)
 ECStack.pop()
 ECStack.pop()
 ```
-从上下文堆栈可以看出，var x=10会影响calling context 也就是global； 而var y=20会影响function context也就是<foo>； 所以最后在global上下文访问x的值是10，而y是not defined。
+从上下文堆栈可以看出，var x=10会影响calling context 也就是global； 而var y=20会影响function context也就是`<foo>`； 所以最后在global上下文访问x的值是10，而y是not defined。
 
 #### Key points for ECStack
 * 单线程
