@@ -17,6 +17,8 @@ tags: Javascript
 
 [https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)
 
+[https://www.cnblogs.com/zhuzhenwei918/p/6131345.html](https://www.cnblogs.com/zhuzhenwei918/p/6131345.html)
+
 ### What is the Execution Context
 
 什么是执行上下文？ 首先顾名思义，执行上下文就是代码执行的环境。 换句话说，当在不同执行上下文里面执行相同的代码，结果有可能不一样。 e.g. this的指向不同导致结果不一样。
@@ -34,6 +36,8 @@ ECMAScript分下面几种代码类型，每种代码都是在其执行上下文�
 有几点值得注意：
 * 调用另一个上下文的上下文被称为caller，而被调用的上下文被称为callee。
 * 同一个函数可以创建多个上下文，比如递归调用。
+
+
 
 ### Execution Context Stack
 
@@ -124,6 +128,8 @@ ECStack.pop()
 * 当递归调用的时候，可以有无限的function context
 * 每个函数调用的时候都会创建一个新的execution context（或者说function context）
 
+
+
 ### Execution Context in Detail 
 现在我们知道函数调用会创建一个新的执行上下文，而JS引擎会把这个创建过程分为两个步骤：
 1. 创建阶段
@@ -155,15 +161,87 @@ ECStack.pop()
 
 
 
-
 ### Variable/Activation Object (ES3) || Variable Environment (ES5)
 TBD
+
+
 
 ### Scope Chain/ Lexical Environment
 TBD
 
+
+
 ### Closures
-TBD
+闭包是一个函数和声明该函数的词法环境的组合。理论上所有函数都是闭包。
+```javascript
+    function init() {
+    let name = "Mozilla"; 
+    // name 是一个被init创建的局部变量
+        function displayName() { 
+            // displayName() 是一个内部函数,
+            console.log(`name = ${name}`); 
+            //  一个闭包使用在父函数中声明的变量
+        } 
+        displayName();
+    }
+    init();
+```
+上面的例子说明，嵌套的函数可以访问到其外层作用域中声明的变量。
+再来看下面这个闭包示例：
+```javascript
+    var a=[];
+    for(var i=0;i<10;i++){
+        a[i]=function(){
+        console.log(i);
+        };
+    }
+    a[0](); //10
+```
+要理解这个结果，关键在于那个括号**()**，只有带括号的时候才是执行函数，a[i]=function... 这句代码只是把函数引用赋予a[i]这个变量，还未进行执行也就未进行变量值的解析。 
+当for循环结束的时候，global上下文的i值已经变为10了，这时候执行a[0]()，开始进行变量解析，发现function本身的作用域没找到定义的i，于是往外部作用域向上查找，在global作用域找到i而且值为10，于是输出10。
+
+    NOTE：注意这里创建的闭包，都是共享同一个作用域链（也称作词法环境）的([[Scope]]属性)。 
+
+接下来看下面这个例子，由于let创建了块级作用域，函数往上查找作用域链的时候会在块级作用域里找到定义的i，这时候i为当时块级作用域设置的值，故返回expect的value。
+```javascript
+    var a=[];
+    for(let i=0;i<10;i++){
+        a[i]=function(){
+        console.log(i);
+        };
+    }
+    a[0](); //0
+
+    //可以理解为创建了多个块级作用域；
+    //{
+    //    let i=0;
+    //    a[i]=function (){console.log(i)}
+    //}
+
+    //{
+    //    let i=1;
+    //    a[i]=function (){console.log(i)}
+    //}
+    //...
+
+    //当执行a[0]()的时候，会找到定义时所在的作用域，由于函数里没定义i，于是往上查找，在块级作用域里找到i的值为0于是返回。
+```
+    NOTE: 上面这种通过捕获函数创建时所在的环境来解析变量值做法，从理论上来说是实现了静态作用域。
+
+在ES6之前没块级作用域，可以用另外一种办法,手动创建一个作用域，只有函数可以创建作用域，所以这里用到了立即执行函数并把当前的i值传进去：
+```javascript
+    var a=[];
+    for(var i=0;i<10;i++){
+        a[i]=(function(n){
+	    	return function(){
+            console.log(n);}
+        })(i);
+    }
+```
+上面的例子可以理解为手动创建了多个作用域，因为使用立即执行函数会立即执行，所以值会马上传递进里层函数；虽然立即执行函数销毁了，但是闭包会保存当时定义函数时上下文中的数据，如图中的[[Scope]]属性：
+![Closure2.png](Closure2.png)
+
+
 
 ### This
 
@@ -204,7 +282,7 @@ function f2() {
 f2() === undefined; // true
 ```
 
-#### apply/call
+##### apply/call
 apply和call都是在Function.prototype里面定义的，使用apply/call可以把this的值从一个上下文传递到另一个上下文。
 ```javascript
     //Usage
@@ -227,7 +305,7 @@ apply和call都是在Function.prototype里面定义的，使用apply/call可以�
     whatsThis.apply(obj); // 'Custom'
 ```
 
-#### bind
+##### bind
 bind定义在Function.prototpye下, 同样用来改变this的指向。 当使用fun.bind(someObj)的时候，将创建一个新方法（**bound function**），这个函数会有相同的函数体和作用域， 但是this将会永久绑定到bind的第一个参数。 和call/apply的立即执行不同，这里只是添加了一个永久绑定，没有执行。
 
 ```javascript
@@ -268,8 +346,8 @@ bind定义在Function.prototpye下, 同样用来改变this的指向。 当使用
     b.getA() //inner
 ```
 
-#### Arrow function
-箭头函数，和其它普通函数相比它没有独立的this而是使用当前词法上下文中的this。用上面使用的setTimeout例子，箭头函数可以保持this指向构造函数创建的对象。
+##### Arrow function
+箭头函数，和其它普通函数相比它没有独立的this而是使用当前词法上下文中的this, 换句话说就是定义时所在对象的this，而非执行时所在的对象的this。用上面使用的setTimeout例子，箭头函数可以保持this指向构造函数创建的对象。
 
 ```javascript
     //Arrow function to keep this retain
@@ -298,7 +376,7 @@ bind定义在Function.prototpye下, 同样用来改变this的指向。 当使用
 其中后面临时把this赋值给变量that的做法，使用的正是闭包：
 ![Closure.png](Closure.png)
 
-#### As an object method
+##### As an object method
 当函数作为对象的一个方法被调用的时候，this指向被调用函数所在的对象。
 
 ```javascript
@@ -312,7 +390,7 @@ bind定义在Function.prototpye下, 同样用来改变this的指向。 当使用
     console.log(o.f()); // 233
 ```
 
-#### As a constructor
+##### As a constructor
 当函数被用作构造函数（使用new关键字），this指向这个新构造出来的对象。值得注意的是，假如构造函数返回一个对象，那么new的时候this自动绑定的新对象就会失效，this指向返回的对象，如下面例子中的C2.
 
 ```javascript
@@ -372,3 +450,4 @@ a = 1;
     }
 }());
 ```
+需要注意的是，let声明的变量不存在变量提升，只能先声明后使用。 let和var的区别在于let是ECMAScript2015规范下的新关键字，可以创建块级作用域。
