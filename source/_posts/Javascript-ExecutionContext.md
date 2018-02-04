@@ -1,6 +1,6 @@
 ---
 title: Javascript_ExecutionContext
-date: 2018-01-26 21:34:19
+date: 2018-02-04 21:34:19
 tags: Javascript
 ---
 
@@ -14,6 +14,8 @@ tags: Javascript
 [http://www.xiaojichao.com/post/jscorev2.html](http://www.xiaojichao.com/post/jscorev2.html)
 
 [http://www.cnblogs.com/TomXu/archive/2012/01/13/2308101.html](http://www.cnblogs.com/TomXu/archive/2012/01/13/2308101.html)
+
+[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this)
 
 ### What is the Execution Context
 
@@ -164,7 +166,172 @@ TBD
 TBD
 
 ### This
-TBD
+
+在JS里面，this是execution context中的一个属性，值是进入上下文的时候决定的，在上下文运行期间不能进行修改。
+
+#### Global Context
+在global上下文中，this指向global object。
+
+```javascript
+    //在浏览器中， window对象和global对象等价
+    console.log(this === window); // true
+    
+    a = 233;
+    console.log(window.a); // 233
+
+    this.b = "MDN";
+    console.log(window.b)  // "MDN"
+```
+
+#### Function context
+在函数内，this的指向取决于函数是如何被调用的。
+
+##### Simple call
+```javascript
+//在非严格模式下，函数里的this默认指向window
+function f1() {
+  return this;
+}
+
+f1() === window; // true 
+
+//在严格模式下，this取进入上下文的值，由于没指定故为undefined
+function f2() {
+  'use strict'; // strict mode
+  return this;
+}
+
+f2() === undefined; // true
+```
+
+#### apply/call
+apply和call都是在Function.prototype里面定义的，使用apply/call可以把this的值从一个上下文传递到另一个上下文。
+```javascript
+    //Usage
+    //func.apply(thisArg, [argsArray])
+    //function.call(thisArg, arg1, arg2, ...)
+    //用法没什么区别，只是其它传入参数在使用apply时候会是用一个arguments数组在第二参数指定,而call则是接受一个argument列表逐个指定参数。
+
+    // 可以把一个对象作为第一个参数传入apply/call，这会使this绑定到该对象
+    var obj = {a: 'Custom'};
+
+    // This property is set on the global object
+    var a = 'Global';
+
+    function whatsThis(arg) {
+    return this.a;  // The value of this is dependent on how the function is called
+    }
+
+    whatsThis();          // 'Global'
+    whatsThis.call(obj);  // 'Custom'
+    whatsThis.apply(obj); // 'Custom'
+```
+
+#### bind
+bind定义在Function.prototpye下, 同样用来改变this的指向。 当使用fun.bind(someObj)的时候，将创建一个新方法（**bound function**），这个函数会有相同的函数体和作用域， 但是this将会永久绑定到bind的第一个参数。 和call/apply的立即执行不同，这里只是添加了一个永久绑定，没有执行。
+
+```javascript
+    //Usage:
+    //fun.bind(thisArg[, arg1[, arg2[, ...]]])
+
+    function f() {
+        return this.a;
+    }
+
+    var g = f.bind({a: 'azerty'});
+    console.log(g()); // azerty
+
+    var h = g.bind({a: 'yoo'}); // bind only works once!
+    console.log(h()); // azerty
+
+    var o = {a: 37, f: f, g: g, h: h};
+    console.log(o.f(), o.g(), o.h()); // 37, azerty, azerty
+```
+
+通常使用window.setTimeout的时候，默认this会指向window，其中一种方法改变this的指向便是使用bind：
+```javascript
+    var a = 'window';
+    
+    function Foo(){
+	    this.a = 'inner';
+	    this.getA = function (){setTimeout(function(){console.log(this.a)}, 1000)}
+    }
+    var f = new Foo()
+    f.getA() //window
+
+    function Bar(){
+	    this.a = 'inner';
+        this.getA = function (){setTimeout(function(){console.log(this.a)}.bind(this), 1000)};
+    }    
+    
+    var b = new Bar()
+    b.getA() //inner
+```
+
+#### Arrow function
+箭头函数，和其它普通函数相比它没有独立的this而是使用当前词法上下文中的this。用上面使用的setTimeout例子，箭头函数可以保持this指向构造函数创建的对象。
+
+```javascript
+    //Arrow function to keep this retain
+    var a = 'window';
+    function Baz(){
+	    this.a = 'inner';
+        this.getA = function (){setTimeout(()=>{console.log(this.a)}, 1000)};
+    }    
+    
+    var z = new Baz()
+    z.getA() //inner
+
+
+    //Another method in ECMAScript 3/5 to fix by assign value of this to a variable， 应该是使用了闭包
+    var a = 'window';
+    function Bla(){
+        var that = this;
+	    this.a = 'inner';
+        this.getA = function (){setTimeout(function(){console.log(that.a)}, 1000)};
+    }    
+    
+    var l = new Bla()
+    l.getA() //inner
+```
+
+其中后面临时把this赋值给变量that的做法，使用的正是闭包：
+![Closure.png](Closure.png)
+
+#### As an object method
+当函数作为对象的一个方法被调用的时候，this指向被调用函数所在的对象。
+
+```javascript
+    var o = {
+        prop: 233,
+        f: function() {
+            return this.prop;
+        }
+    };
+
+    console.log(o.f()); // 233
+```
+
+#### As a constructor
+当函数被用作构造函数（使用new关键字），this指向这个新构造出来的对象。值得注意的是，假如构造函数返回一个对象，那么new的时候this自动绑定的新对象就会失效，this指向返回的对象，如下面例子中的C2.
+
+```javascript
+    function C() {
+        this.a = 233;
+    }
+
+    var o = new C();
+    console.log(o.a); //233
+
+    function C2() {
+        this.a = 233; //dead code
+        return {a: 666};
+    }
+
+    o = new C2();
+    console.log(o.a); //666
+```
+
 
 ### Hoisting
 
