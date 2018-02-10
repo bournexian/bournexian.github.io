@@ -1,6 +1,6 @@
 ---
 title: Javascript_ExecutionContext
-date: 2018-02-04 21:34:19
+date: 2018-02-10 21:34:19
 tags: Javascript
 ---
 
@@ -166,10 +166,84 @@ TBD
 
 
 
-### Scope Chain/ Lexical Environment
-TBD
+### Scope Chain （ES3） || Lexical Environment (ES5)
 
+#### Environment
+环境可以理解成定义在一个作用域中的变量、函数和类的仓库。
+词法环境则引申为 定义出现在上下文中的*标识符*与其值之间的关联结构。
 
+从技术上来讲，环境是由一对 Environment Record (将标识符映射到值的实际存储表) 以及对父的引用（可能为null）组成的。
+
+用下面代码举例：
+```javascript
+    let x = 10;
+    let y = 20;
+    function foo(z) {
+    let x = 100;
+    return x + y + z;
+    }
+    foo(30); // 150
+```
+
+global context 和 foo <function context> 共同组成环境结构：
+![environment-chain.png](environment-chain.png)
+
+这和上一篇文章里面介绍的原型链类似，这里的标识符解析步骤如下： 如果一个变量在自己的环境中找不到，就尝试从父环境和祖先环境中查找，直到查完整个环境链。 注意这里global context的Parent指向就为null， 标志结束。
+
+**Identifier Resolution**
+一个环境链中解析一个变量（binding）的过程。 解析不出来的绑定会抛出*ReferenceError*。
+
+这样解释了x解析为100而不是10，因为在foo自己的环境找到了x，这些变量都是存放在activation environment里面。 而y则是通过环境链往上查找，在global context里面找到并予以解析。
+
+和原型类似，同样的父环境能够被多个子环境共享，e.g. 两个全局函数将共享同样的global environment。
+而环境记录有很多种:
+* object env
+* declarative env
+* function env
+* module env
+
+虽然每种类型的记录都有自己特定的属性。 但是标识符解析的方法不依赖于特定的record，都使用一套通用的方法来进行解析。如上一小节所述的解析步骤。 
+
+下面是一个关于global env record的示例：
+
+```javascript
+    // Legacy variables using `var`.
+var x = 10;
+ 
+// Modern variables using `let`.
+let y = 20;
+ 
+// Both are added to the environment record:
+console.log(
+  x, // 10
+  y, // 20
+);
+ 
+// But only `x` is added to the "binding object".
+// The binding object of the global environment
+// is the global object, and equals to `this`:
+ 
+console.log(
+  this.x, // 10
+  this.y, // undefined!
+);
+ 
+// Binding object can store a name which is not
+// added to the environment record, since it's
+// not a valid identifier:
+ 
+this['not valid ID'] = 30;
+ 
+console.log(
+  this['not valid ID'], // 30
+);
+```
+
+其对应的binding object及env关系的图片如下：
+![env-binding-object.png](env-binding-object.png)
+
+这里的binding object是为了cover旧的var声明语句，with语句等，所以使用let语句声明时不会存放在绑定对象中，故this.y为undefined。
+换句话说，直接访问变量的时候，是访问env record里面的值，而this[properity]访问属性的时候，是访问binding object （此例中同样是global object以及this的指向）。
 
 ### Closures
 闭包是一个函数和声明该函数的词法环境的组合。理论上所有函数都是闭包。
@@ -238,7 +312,7 @@ TBD
         })(i);
     }
 ```
-上面的例子可以理解为手动创建了多个作用域，因为使用立即执行函数会立即执行，所以值会马上传递进里层函数；虽然立即执行函数销毁了，但是闭包会保存当时定义函数时上下文中的数据，如图中的[[Scope]]属性：
+上面的例子可以理解为手动创建了多个作用域(或者说创建了多个执行上下文)，因为使用立即执行函数会立即执行，所以值会马上传递进里层函数；虽然立即执行函数销毁了，但是闭包会保存当时定义函数时上下文中的数据，如图中的[[Scope]]属性：
 ![Closure2.png](Closure2.png)
 
 
