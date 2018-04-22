@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Javascript," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blog of BourneXian" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Javascript Execution Context上一篇了解完原型，这篇将去了解下执行上下文。下面基于参考资料整理的知识点，同时也会加入一些自己的理解。 Reference:http://davidshariff.com/blog/what-is-the-execution-context-in-javascript/ http://www.xiaojichao.com/post/jscor">
+<meta name="keywords" content="Javascript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Javascript_ExecutionContext">
+<meta property="og:url" content="https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/index.html">
+<meta property="og:site_name" content="Blog of BourneXian">
+<meta property="og:description" content="Javascript Execution Context上一篇了解完原型，这篇将去了解下执行上下文。下面基于参考资料整理的知识点，同时也会加入一些自己的理解。 Reference:http://davidshariff.com/blog/what-is-the-execution-context-in-javascript/ http://www.xiaojichao.com/post/jscor">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/environment-chain.png">
+<meta property="og:image" content="https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/env-binding-object.png">
+<meta property="og:image" content="https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/Closure2.png">
+<meta property="og:image" content="https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/Closure.png">
+<meta property="og:updated_time" content="2018-02-10T15:49:59.179Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Javascript_ExecutionContext">
+<meta name="twitter:description" content="Javascript Execution Context上一篇了解完原型，这篇将去了解下执行上下文。下面基于参考资料整理的知识点，同时也会加入一些自己的理解。 Reference:http://davidshariff.com/blog/what-is-the-execution-context-in-javascript/ http://www.xiaojichao.com/post/jscor">
+<meta name="twitter:image" content="https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/environment-chain.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/"/>
+
+
+
+
+
+  <title>Javascript_ExecutionContext | Blog of BourneXian</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blog of BourneXian</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blog of BourneXian">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Javascript_ExecutionContext</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-10T21:34:19+08:00">
+                2018-02-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/02/10/Javascript-ExecutionContext/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/02/10/Javascript-ExecutionContext/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Javascript-Execution-Context"><a href="#Javascript-Execution-Context" class="headerlink" title="Javascript Execution Context"></a>Javascript Execution Context</h2><p>上一篇了解完原型，这篇将去了解下执行上下文。下面基于参考资料整理的知识点，同时也会加入一些自己的理解。</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://davidshariff.com/blog/what-is-the-execution-context-in-javascript/" target="_blank" rel="external">http://davidshariff.com/blog/what-is-the-execution-context-in-javascript/</a></p>
+<p><a href="http://www.xiaojichao.com/post/jscorev2.html" target="_blank" rel="external">http://www.xiaojichao.com/post/jscorev2.html</a></p>
+<p><a href="http://www.cnblogs.com/TomXu/archive/2012/01/13/2308101.html" target="_blank" rel="external">http://www.cnblogs.com/TomXu/archive/2012/01/13/2308101.html</a></p>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this</a></p>
+<p><a href="https://www.cnblogs.com/zhuzhenwei918/p/6131345.html" target="_blank" rel="external">https://www.cnblogs.com/zhuzhenwei918/p/6131345.html</a></p>
+<h3 id="What-is-the-Execution-Context"><a href="#What-is-the-Execution-Context" class="headerlink" title="What is the Execution Context"></a>What is the Execution Context</h3><p>什么是执行上下文？ 首先顾名思义，执行上下文就是代码执行的环境。 换句话说，当在不同执行上下文里面执行相同的代码，结果有可能不一样。 e.g. this的指向不同导致结果不一样。</p>
+<p>ECMAScript分下面几种代码类型，每种代码都是在其执行上下文中求值。</p>
+<ul>
+<li>全局代码 – 代码执行的默认环境</li>
+<li>函数代码 – 函数体内的代码</li>
+<li>eval代码 – eval函数内包含的文本</li>
+</ul>
+<blockquote>
+<p>NOTE： 模块代码 也算一种？</p>
+</blockquote>
+<p>首先默认有一个Global Context，全局代码在这个全局的上下文里执行。 而当函数被调用的时候，就创建了一个新的执行上下文，并被push到栈顶，同时栈顶指向的就是当前激活的执行上下文。</p>
+<p>有几点值得注意：</p>
+<ul>
+<li>调用另一个上下文的上下文被称为caller，而被调用的上下文被称为callee。</li>
+<li>同一个函数可以创建多个上下文，比如递归调用。</li>
+</ul>
+<h3 id="Execution-Context-Stack"><a href="#Execution-Context-Stack" class="headerlink" title="Execution Context Stack"></a>Execution Context Stack</h3><p>假如定义执行上下文堆栈为数组：<br>    ECStack = []</p>
+<h4 id="global-code"><a href="#global-code" class="headerlink" title="global code"></a>global code</h4><p>那么全局代码执行时，堆栈是这样子的:<br>    ECStack = [globalContext]</p>
+<h4 id="function-code"><a href="#function-code" class="headerlink" title="function code"></a>function code</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    bar()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    baz()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">baz</span>(<span class="params"></span>)</span>&#123;&#125;</div></pre></td></tr></table></figure>
+<p>上下文堆栈的变化过程依次为：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">ECStack = [globalContext]</div><div class="line"><span class="comment">//进入foo函数时的执行上下文栈， 该执行上下文被激活</span></div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext]</div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext, &lt;bar&gt; functionContext]</div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext, &lt;bar&gt; functionContext, &lt;baz&gt; functionContext]</div><div class="line"><span class="comment">//退出baz函数，根据FILO原则，栈顶的baz退出栈</span></div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext, &lt;bar&gt; functionContext]</div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext]</div><div class="line">ECStack = [globalContext]</div></pre></td></tr></table></figure></p>
+<blockquote>
+<p>NOTE: 有些对象，比如generator，可能会违反栈的LIFO顺序。一个generator函数可能会挂起其正在执行的上下文，并在结束前将其从栈中删除。一旦generator再次激活，它上下文就被回复，并再次压入栈中：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> *<span class="title">gen</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">yield</span> <span class="number">1</span>;</div><div class="line">  <span class="keyword">return</span> <span class="number">2</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">let</span> g = gen();</div><div class="line"><span class="built_in">console</span>.log(</div><div class="line">  g.next().value, <span class="comment">// 1</span></div><div class="line">  g.next().value, <span class="comment">// 2</span></div><div class="line">);</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h4 id="eval-code"><a href="#eval-code" class="headerlink" title="eval code"></a>eval code</h4><p>这里有个新概念，eval调用的时候产生的上下文被称为调用上下文(calling context)，区别于evalContext。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">eval</span>(<span class="string">'var x = 10'</span>);</div><div class="line"> </div><div class="line">(<span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">eval</span>(<span class="string">'var y = 20'</span>);</div><div class="line">&#125;)();</div><div class="line"> </div><div class="line">alert(x); <span class="comment">// 10</span></div><div class="line">alert(y); <span class="comment">// not defined</span></div></pre></td></tr></table></figure></p>
+<p>上下文堆栈变化依次为：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ECStack = [globalContext]</div><div class="line"></div><div class="line"><span class="comment">// eval('var x=10')</span></div><div class="line">ECStack.push(evalContext, <span class="attr">callingContext</span>: globalContext)</div><div class="line">ECStack.pop()</div><div class="line"></div><div class="line"><span class="comment">// foo function call</span></div><div class="line">ECStack.push(<span class="xml"><span class="tag">&lt;<span class="name">foo</span>&gt;</span> functionContext)</span></div><div class="line"><span class="xml"></span></div><div class="line"><span class="xml">// eval('var y=20')</span></div><div class="line">ECStack.push(evalContext, callingContext: &lt;foo&gt; functionContext)</div><div class="line">ECStack.pop()</div><div class="line">ECStack.pop()</div></pre></td></tr></table></figure></p>
+<p>从上下文堆栈可以看出，var x=10会影响calling context 也就是global； 而var y=20会影响function context也就是<code>&lt;foo&gt;</code>； 所以最后在global上下文访问x的值是10，而y是not defined。</p>
+<h4 id="Key-points-for-ECStack"><a href="#Key-points-for-ECStack" class="headerlink" title="Key points for ECStack"></a>Key points for ECStack</h4><ul>
+<li>单线程</li>
+<li>同步执行</li>
+<li>只有一个global context</li>
+<li>当递归调用的时候，可以有无限的function context</li>
+<li>每个函数调用的时候都会创建一个新的execution context（或者说function context）</li>
+</ul>
+<h3 id="Execution-Context-in-Detail"><a href="#Execution-Context-in-Detail" class="headerlink" title="Execution Context in Detail"></a>Execution Context in Detail</h3><p>现在我们知道函数调用会创建一个新的执行上下文，而JS引擎会把这个创建过程分为两个步骤：</p>
+<ol>
+<li>创建阶段</li>
+<li>代码执行阶段</li>
+</ol>
+<p>在创建阶段，当函数被调用且开始执行函数体代码之前：</p>
+<ul>
+<li>创建变量， 函数， 参数</li>
+<li>创建作用域链(ES3的说法) 或者是 词法环境（ES5）</li>
+<li>决定this的指向</li>
+</ul>
+<p>而在代码执行阶段：</p>
+<ul>
+<li>给函数参数赋值，中断或执行代码</li>
+</ul>
+<p>可以把execution context理解成一个object，里面有三个主要的属性：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">executionContextES3 = &#123;</div><div class="line">    <span class="string">'scopeChain'</span>: &#123; <span class="comment">/* variableObject + all parent execution context's variableObject */</span> &#125;,</div><div class="line">    <span class="string">'variableObject'</span>: &#123; <span class="comment">/* function arguments / parameters, inner variable and function declarations */</span> &#125;,</div><div class="line">    <span class="string">'this'</span>: &#123;&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">executionContextES5 = &#123;</div><div class="line">    ThisBinding: <span class="xml"><span class="tag">&lt;<span class="name">this</span> <span class="attr">value</span>&gt;</span>,</span></div><div class="line"><span class="xml">    VariableEnvironment: &#123; ... &#125;,</span></div><div class="line"><span class="xml">    LexicalEnvironment: &#123; ... &#125;,</span></div><div class="line"><span class="xml">&#125;</span></div></pre></td></tr></table></figure></p>
+<h3 id="Variable-Activation-Object-ES3-Variable-Environment-ES5"><a href="#Variable-Activation-Object-ES3-Variable-Environment-ES5" class="headerlink" title="Variable/Activation Object (ES3) || Variable Environment (ES5)"></a>Variable/Activation Object (ES3) || Variable Environment (ES5)</h3><p>TBD</p>
+<h3 id="Scope-Chain-（ES3）-Lexical-Environment-ES5"><a href="#Scope-Chain-（ES3）-Lexical-Environment-ES5" class="headerlink" title="Scope Chain （ES3） || Lexical Environment (ES5)"></a>Scope Chain （ES3） || Lexical Environment (ES5)</h3><h4 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h4><p>环境可以理解成定义在一个作用域中的变量、函数和类的仓库。<br>词法环境则引申为 定义出现在上下文中的<em>标识符</em>与其值之间的关联结构。</p>
+<p>从技术上来讲，环境是由一对 Environment Record (将标识符映射到值的实际存储表) 以及对父的引用（可能为null）组成的。</p>
+<p>用下面代码举例：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> x = <span class="number">10</span>;</div><div class="line"><span class="keyword">let</span> y = <span class="number">20</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">z</span>) </span>&#123;</div><div class="line"><span class="keyword">let</span> x = <span class="number">100</span>;</div><div class="line"><span class="keyword">return</span> x + y + z;</div><div class="line">&#125;</div><div class="line">foo(<span class="number">30</span>); <span class="comment">// 150</span></div></pre></td></tr></table></figure></p>
+<p>global context 和 foo <function context=""> 共同组成环境结构：<br><img src="/2018/02/10/Javascript-ExecutionContext/environment-chain.png" alt="environment-chain.png"></function></p>
+<p>这和上一篇文章里面介绍的原型链类似，这里的标识符解析步骤如下： 如果一个变量在自己的环境中找不到，就尝试从父环境和祖先环境中查找，直到查完整个环境链。 注意这里global context的Parent指向就为null， 标志结束。</p>
+<p><strong>Identifier Resolution</strong><br>一个环境链中解析一个变量（binding）的过程。 解析不出来的绑定会抛出<em>ReferenceError</em>。</p>
+<p>这样解释了x解析为100而不是10，因为在foo自己的环境找到了x，这些变量都是存放在activation environment里面。 而y则是通过环境链往上查找，在global context里面找到并予以解析。</p>
+<p>和原型类似，同样的父环境能够被多个子环境共享，e.g. 两个全局函数将共享同样的global environment。<br>而环境记录有很多种:</p>
+<ul>
+<li>object env</li>
+<li>declarative env</li>
+<li>function env</li>
+<li>module env</li>
+</ul>
+<p>虽然每种类型的记录都有自己特定的属性。 但是标识符解析的方法不依赖于特定的record，都使用一套通用的方法来进行解析。如上一小节所述的解析步骤。 </p>
+<p>下面是一个关于global env record的示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">    <span class="comment">// Legacy variables using `var`.</span></div><div class="line"><span class="keyword">var</span> x = <span class="number">10</span>;</div><div class="line"> </div><div class="line"><span class="comment">// Modern variables using `let`.</span></div><div class="line"><span class="keyword">let</span> y = <span class="number">20</span>;</div><div class="line"> </div><div class="line"><span class="comment">// Both are added to the environment record:</span></div><div class="line"><span class="built_in">console</span>.log(</div><div class="line">  x, <span class="comment">// 10</span></div><div class="line">  y, <span class="comment">// 20</span></div><div class="line">);</div><div class="line"> </div><div class="line"><span class="comment">// But only `x` is added to the "binding object".</span></div><div class="line"><span class="comment">// The binding object of the global environment</span></div><div class="line"><span class="comment">// is the global object, and equals to `this`:</span></div><div class="line"> </div><div class="line"><span class="built_in">console</span>.log(</div><div class="line">  <span class="keyword">this</span>.x, <span class="comment">// 10</span></div><div class="line">  <span class="keyword">this</span>.y, <span class="comment">// undefined!</span></div><div class="line">);</div><div class="line"> </div><div class="line"><span class="comment">// Binding object can store a name which is not</span></div><div class="line"><span class="comment">// added to the environment record, since it's</span></div><div class="line"><span class="comment">// not a valid identifier:</span></div><div class="line"> </div><div class="line"><span class="keyword">this</span>[<span class="string">'not valid ID'</span>] = <span class="number">30</span>;</div><div class="line"> </div><div class="line"><span class="built_in">console</span>.log(</div><div class="line">  <span class="keyword">this</span>[<span class="string">'not valid ID'</span>], <span class="comment">// 30</span></div><div class="line">);</div></pre></td></tr></table></figure>
+<p>其对应的binding object及env关系的图片如下：<br><img src="/2018/02/10/Javascript-ExecutionContext/env-binding-object.png" alt="env-binding-object.png"></p>
+<p>这里的binding object是为了cover旧的var声明语句，with语句等，所以使用let语句声明时不会存放在绑定对象中，故this.y为undefined。<br>换句话说，直接访问变量的时候，是访问env record里面的值，而this[properity]访问属性的时候，是访问binding object （此例中同样是global object以及this的指向）。</p>
+<h3 id="Closures"><a href="#Closures" class="headerlink" title="Closures"></a>Closures</h3><p>闭包是一个函数和声明该函数的词法环境的组合。理论上所有函数都是闭包。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span>(<span class="params"></span>) </span>&#123;</div><div class="line"><span class="keyword">let</span> name = <span class="string">"Mozilla"</span>; </div><div class="line"><span class="comment">// name 是一个被init创建的局部变量</span></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">displayName</span>(<span class="params"></span>) </span>&#123; </div><div class="line">        <span class="comment">// displayName() 是一个内部函数,</span></div><div class="line">        <span class="built_in">console</span>.log(<span class="string">`name = <span class="subst">$&#123;name&#125;</span>`</span>); </div><div class="line">        <span class="comment">//  一个闭包使用在父函数中声明的变量</span></div><div class="line">    &#125; </div><div class="line">    displayName();</div><div class="line">&#125;</div><div class="line">init();</div></pre></td></tr></table></figure></p>
+<p>上面的例子说明，嵌套的函数可以访问到其外层作用域中声明的变量。<br>再来看下面这个闭包示例：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a=[];</div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</div><div class="line">    a[i]=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(i);</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line">a[<span class="number">0</span>](); <span class="comment">//10</span></div></pre></td></tr></table></figure></p>
+<p>要理解这个结果，关键在于那个括号<strong>()</strong>，只有带括号的时候才是执行函数，a[i]=function… 这句代码只是把函数引用赋予a[i]这个变量，还未进行执行也就未进行变量值的解析。<br>当for循环结束的时候，global上下文的i值已经变为10了，这时候执行a<a href="">0</a>，开始进行变量解析，发现function本身的作用域没找到定义的i，于是往外部作用域向上查找，在global作用域找到i而且值为10，于是输出10。</p>
+<pre><code>NOTE：注意这里创建的闭包，都是共享同一个作用域链（也称作词法环境）的([[Scope]]属性)。 
+</code></pre><p>接下来看下面这个例子，由于let创建了块级作用域，函数往上查找作用域链的时候会在块级作用域里找到定义的i，这时候i为当时块级作用域设置的值，故返回expect的value。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a=[];</div><div class="line"><span class="keyword">for</span>(<span class="keyword">let</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</div><div class="line">    a[i]=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(i);</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line">a[<span class="number">0</span>](); <span class="comment">//0</span></div><div class="line"></div><div class="line"><span class="comment">//可以理解为创建了多个块级作用域；</span></div><div class="line"><span class="comment">//&#123;</span></div><div class="line"><span class="comment">//    let i=0;</span></div><div class="line"><span class="comment">//    a[i]=function ()&#123;console.log(i)&#125;</span></div><div class="line"><span class="comment">//&#125;</span></div><div class="line"></div><div class="line"><span class="comment">//&#123;</span></div><div class="line"><span class="comment">//    let i=1;</span></div><div class="line"><span class="comment">//    a[i]=function ()&#123;console.log(i)&#125;</span></div><div class="line"><span class="comment">//&#125;</span></div><div class="line"><span class="comment">//...</span></div><div class="line"></div><div class="line"><span class="comment">//当执行a[0]()的时候，会找到定义时所在的作用域，由于函数里没定义i，于是往上查找，在块级作用域里找到i的值为0于是返回。</span></div></pre></td></tr></table></figure></p>
+<pre><code>NOTE: 上面这种通过捕获函数创建时所在的环境来解析变量值做法，从理论上来说是实现了静态作用域。
+</code></pre><p>在ES6之前没块级作用域，可以用另外一种办法,手动创建一个作用域，只有函数可以创建作用域，所以这里用到了立即执行函数并把当前的i值传进去：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a=[];</div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</div><div class="line">    a[i]=(<span class="function"><span class="keyword">function</span>(<span class="params">n</span>)</span>&#123;</div><div class="line"> 	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(n);&#125;</div><div class="line">    &#125;)(i);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上面的例子可以理解为手动创建了多个作用域(或者说创建了多个执行上下文)，因为使用立即执行函数会立即执行，所以值会马上传递进里层函数；虽然立即执行函数销毁了，但是闭包会保存当时定义函数时上下文中的数据，如图中的[[Scope]]属性：<br><img src="/2018/02/10/Javascript-ExecutionContext/Closure2.png" alt="Closure2.png"></p>
+<h3 id="This"><a href="#This" class="headerlink" title="This"></a>This</h3><p>在JS里面，this是execution context中的一个属性，值是进入上下文的时候决定的，在上下文运行期间不能进行修改。</p>
+<h4 id="Global-Context"><a href="#Global-Context" class="headerlink" title="Global Context"></a>Global Context</h4><p>在global上下文中，this指向global object。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//在浏览器中， window对象和global对象等价</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">this</span> === <span class="built_in">window</span>); <span class="comment">// true</span></div><div class="line"></div><div class="line">a = <span class="number">233</span>;</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span>.a); <span class="comment">// 233</span></div><div class="line"></div><div class="line"><span class="keyword">this</span>.b = <span class="string">"MDN"</span>;</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span>.b)  <span class="comment">// "MDN"</span></div></pre></td></tr></table></figure>
+<h4 id="Function-context"><a href="#Function-context" class="headerlink" title="Function context"></a>Function context</h4><p>在函数内，this的指向取决于函数是如何被调用的。</p>
+<h5 id="Simple-call"><a href="#Simple-call" class="headerlink" title="Simple call"></a>Simple call</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//在非严格模式下，函数里的this默认指向window</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f1</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">f1() === <span class="built_in">window</span>; <span class="comment">// true </span></div><div class="line"></div><div class="line"><span class="comment">//在严格模式下，this取进入上下文的值，由于没指定故为undefined</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f2</span>(<span class="params"></span>) </span>&#123;</div><div class="line"><span class="meta">  'use strict'</span>; <span class="comment">// strict mode</span></div><div class="line">  <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">f2() === <span class="literal">undefined</span>; <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<h5 id="apply-call"><a href="#apply-call" class="headerlink" title="apply/call"></a>apply/call</h5><p>apply和call都是在Function.prototype里面定义的，使用apply/call可以把this的值从一个上下文传递到另一个上下文。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Usage</span></div><div class="line"><span class="comment">//func.apply(thisArg, [argsArray])</span></div><div class="line"><span class="comment">//function.call(thisArg, arg1, arg2, ...)</span></div><div class="line"><span class="comment">//用法没什么区别，只是其它传入参数在使用apply时候会是用一个arguments数组在第二参数指定,而call则是接受一个argument列表逐个指定参数。</span></div><div class="line"></div><div class="line"><span class="comment">// 可以把一个对象作为第一个参数传入apply/call，这会使this绑定到该对象</span></div><div class="line"><span class="keyword">var</span> obj = &#123;<span class="attr">a</span>: <span class="string">'Custom'</span>&#125;;</div><div class="line"></div><div class="line"><span class="comment">// This property is set on the global object</span></div><div class="line"><span class="keyword">var</span> a = <span class="string">'Global'</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">whatsThis</span>(<span class="params">arg</span>) </span>&#123;</div><div class="line"><span class="keyword">return</span> <span class="keyword">this</span>.a;  <span class="comment">// The value of this is dependent on how the function is called</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">whatsThis();          <span class="comment">// 'Global'</span></div><div class="line">whatsThis.call(obj);  <span class="comment">// 'Custom'</span></div><div class="line">whatsThis.apply(obj); <span class="comment">// 'Custom'</span></div></pre></td></tr></table></figure></p>
+<h5 id="bind"><a href="#bind" class="headerlink" title="bind"></a>bind</h5><p>bind定义在Function.prototpye下, 同样用来改变this的指向。 当使用fun.bind(someObj)的时候，将创建一个新方法（<strong>bound function</strong>），这个函数会有相同的函数体和作用域， 但是this将会永久绑定到bind的第一个参数。 和call/apply的立即执行不同，这里只是添加了一个永久绑定，没有执行。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Usage:</span></div><div class="line"><span class="comment">//fun.bind(thisArg[, arg1[, arg2[, ...]]])</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.a;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> g = f.bind(&#123;<span class="attr">a</span>: <span class="string">'azerty'</span>&#125;);</div><div class="line"><span class="built_in">console</span>.log(g()); <span class="comment">// azerty</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> h = g.bind(&#123;<span class="attr">a</span>: <span class="string">'yoo'</span>&#125;); <span class="comment">// bind only works once!</span></div><div class="line"><span class="built_in">console</span>.log(h()); <span class="comment">// azerty</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> o = &#123;<span class="attr">a</span>: <span class="number">37</span>, <span class="attr">f</span>: f, <span class="attr">g</span>: g, <span class="attr">h</span>: h&#125;;</div><div class="line"><span class="built_in">console</span>.log(o.f(), o.g(), o.h()); <span class="comment">// 37, azerty, azerty</span></div></pre></td></tr></table></figure>
+<p>通常使用window.setTimeout的时候，默认this会指向window，其中一种方法改变this的指向便是使用bind：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="string">'window'</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Foo</span>(<span class="params"></span>)</span>&#123;</div><div class="line"> <span class="keyword">this</span>.a = <span class="string">'inner'</span>;</div><div class="line"> <span class="keyword">this</span>.getA = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.a)&#125;, <span class="number">1000</span>)&#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> f = <span class="keyword">new</span> Foo()</div><div class="line">f.getA() <span class="comment">//window</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Bar</span>(<span class="params"></span>)</span>&#123;</div><div class="line"> <span class="keyword">this</span>.a = <span class="string">'inner'</span>;</div><div class="line">    <span class="keyword">this</span>.getA = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.a)&#125;.bind(<span class="keyword">this</span>), <span class="number">1000</span>)&#125;;</div><div class="line">&#125;    </div><div class="line"></div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> Bar()</div><div class="line">b.getA() <span class="comment">//inner</span></div></pre></td></tr></table></figure></p>
+<h5 id="Arrow-function"><a href="#Arrow-function" class="headerlink" title="Arrow function"></a>Arrow function</h5><p>箭头函数，和其它普通函数相比它没有独立的this而是使用当前词法上下文中的this, 换句话说就是定义时所在对象的this，而非执行时所在的对象的this。用上面使用的setTimeout例子，箭头函数可以保持this指向构造函数创建的对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Arrow function to keep this retain</span></div><div class="line"><span class="keyword">var</span> a = <span class="string">'window'</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Baz</span>(<span class="params"></span>)</span>&#123;</div><div class="line"> <span class="keyword">this</span>.a = <span class="string">'inner'</span>;</div><div class="line">    <span class="keyword">this</span>.getA = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.a)&#125;, <span class="number">1000</span>)&#125;;</div><div class="line">&#125;    </div><div class="line"></div><div class="line"><span class="keyword">var</span> z = <span class="keyword">new</span> Baz()</div><div class="line">z.getA() <span class="comment">//inner</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">//Another method in ECMAScript 3/5 to fix by assign value of this to a variable， 应该是使用了闭包</span></div><div class="line"><span class="keyword">var</span> a = <span class="string">'window'</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Bla</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">var</span> that = <span class="keyword">this</span>;</div><div class="line"> <span class="keyword">this</span>.a = <span class="string">'inner'</span>;</div><div class="line">    <span class="keyword">this</span>.getA = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(that.a)&#125;, <span class="number">1000</span>)&#125;;</div><div class="line">&#125;    </div><div class="line"></div><div class="line"><span class="keyword">var</span> l = <span class="keyword">new</span> Bla()</div><div class="line">l.getA() <span class="comment">//inner</span></div></pre></td></tr></table></figure>
+<p>其中后面临时把this赋值给变量that的做法，使用的正是闭包：<br><img src="/2018/02/10/Javascript-ExecutionContext/Closure.png" alt="Closure.png"></p>
+<h5 id="As-an-object-method"><a href="#As-an-object-method" class="headerlink" title="As an object method"></a>As an object method</h5><p>当函数作为对象的一个方法被调用的时候，this指向被调用函数所在的对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = &#123;</div><div class="line">    prop: <span class="number">233</span>,</div><div class="line">    f: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.prop;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(o.f()); <span class="comment">// 233</span></div></pre></td></tr></table></figure>
+<h5 id="As-a-constructor"><a href="#As-a-constructor" class="headerlink" title="As a constructor"></a>As a constructor</h5><p>当函数被用作构造函数（使用new关键字），this指向这个新构造出来的对象。值得注意的是，假如构造函数返回一个对象，那么new的时候this自动绑定的新对象就会失效，this指向返回的对象，如下面例子中的C2.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">C</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.a = <span class="number">233</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> o = <span class="keyword">new</span> C();</div><div class="line"><span class="built_in">console</span>.log(o.a); <span class="comment">//233</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">C2</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.a = <span class="number">233</span>; <span class="comment">//dead code</span></div><div class="line">    <span class="keyword">return</span> &#123;<span class="attr">a</span>: <span class="number">666</span>&#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">o = <span class="keyword">new</span> C2();</div><div class="line"><span class="built_in">console</span>.log(o.a); <span class="comment">//666</span></div></pre></td></tr></table></figure>
+<h3 id="Hoisting"><a href="#Hoisting" class="headerlink" title="Hoisting"></a>Hoisting</h3><p>通常译作变量提升，意思是在变量作用域内，不管变量在哪个位置声明，都会提升到作用域顶部。下面是一个具体例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//hoisting</span></div><div class="line"><span class="built_in">console</span>.log(a); <span class="comment">//output undefined 而不是error 'variable a is not defined'</span></div><div class="line"><span class="keyword">var</span> a =<span class="number">1</span>;</div><div class="line"></div><div class="line"><span class="comment">//变量提升后等价于下面语句</span></div><div class="line"><span class="keyword">var</span> a;</div><div class="line"><span class="built_in">console</span>.log(a);</div><div class="line">a = <span class="number">1</span>;</div></pre></td></tr></table></figure></p>
+<p>我理解这个其实和作用域有关，在代码执行之前会有一个创建阶段, 变量已经在AO里面定义了，所以执行时可以找到。<br>需要注意的是，在创建阶段，函数声明会比变量声明先创建，如下面这个例子，因为foo的函数引用先创建，再次声明变量foo的时候发现遇到同名的情况，JS引擎会bypass忽略掉新的变量声明。 而与此相对，当function第二次声明的时候，会覆盖原来的声明，故下面例子输出的是’hi’而不是’hello’。<br>而对于bar，因为这个bar是赋值函数表达式，和函数声明的区别是不会变量提升(hoisting)，所以结果是找不到bar的定义。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; <span class="comment">//立即执行函数</span></div><div class="line"></div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">typeof</span> foo); <span class="comment">// function pointer</span></div><div class="line">	<span class="built_in">console</span>.log(foo()) <span class="comment">//hi</span></div><div class="line">	<span class="built_in">console</span>.log(<span class="keyword">typeof</span> bar); <span class="comment">//undefined</span></div><div class="line">    <span class="built_in">console</span>.log(bar()) <span class="comment">// Uncaught TypeError: bar is not a function</span></div><div class="line">    <span class="keyword">var</span> foo = <span class="string">'hello'</span>,</div><div class="line">        bar = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            <span class="keyword">return</span> <span class="string">'world'</span>;</div><div class="line">        &#125;;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">'hello'</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">'hi'</span></div><div class="line">    &#125;</div><div class="line">&#125;());</div></pre></td></tr></table></figure>
+<p>需要注意的是，let声明的变量不存在变量提升，只能先声明后使用。 let和var的区别在于let是ECMAScript2015规范下的新关键字，可以创建块级作用域。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Javascript/" rel="tag"># Javascript</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/23/Javascript-prototype/" rel="next" title="Javascript_prototype">
+                <i class="fa fa-chevron-left"></i> Javascript_prototype
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/21/angular-post1/" rel="prev" title="Learning Angular">
+                Learning Angular <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Javascript-Execution-Context"><span class="nav-number">1.</span> <span class="nav-text">Javascript Execution Context</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Reference"><span class="nav-number">1.1.</span> <span class="nav-text">Reference:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#What-is-the-Execution-Context"><span class="nav-number">1.2.</span> <span class="nav-text">What is the Execution Context</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Execution-Context-Stack"><span class="nav-number">1.3.</span> <span class="nav-text">Execution Context Stack</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#global-code"><span class="nav-number">1.3.1.</span> <span class="nav-text">global code</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#function-code"><span class="nav-number">1.3.2.</span> <span class="nav-text">function code</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#eval-code"><span class="nav-number">1.3.3.</span> <span class="nav-text">eval code</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Key-points-for-ECStack"><span class="nav-number">1.3.4.</span> <span class="nav-text">Key points for ECStack</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Execution-Context-in-Detail"><span class="nav-number">1.4.</span> <span class="nav-text">Execution Context in Detail</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Variable-Activation-Object-ES3-Variable-Environment-ES5"><span class="nav-number">1.5.</span> <span class="nav-text">Variable/Activation Object (ES3) || Variable Environment (ES5)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Scope-Chain-（ES3）-Lexical-Environment-ES5"><span class="nav-number">1.6.</span> <span class="nav-text">Scope Chain （ES3） || Lexical Environment (ES5)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Environment"><span class="nav-number">1.6.1.</span> <span class="nav-text">Environment</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Closures"><span class="nav-number">1.7.</span> <span class="nav-text">Closures</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#This"><span class="nav-number">1.8.</span> <span class="nav-text">This</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Global-Context"><span class="nav-number">1.8.1.</span> <span class="nav-text">Global Context</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Function-context"><span class="nav-number">1.8.2.</span> <span class="nav-text">Function context</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Simple-call"><span class="nav-number">1.8.2.1.</span> <span class="nav-text">Simple call</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#apply-call"><span class="nav-number">1.8.2.2.</span> <span class="nav-text">apply/call</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#bind"><span class="nav-number">1.8.2.3.</span> <span class="nav-text">bind</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Arrow-function"><span class="nav-number">1.8.2.4.</span> <span class="nav-text">Arrow function</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#As-an-object-method"><span class="nav-number">1.8.2.5.</span> <span class="nav-text">As an object method</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#As-a-constructor"><span class="nav-number">1.8.2.6.</span> <span class="nav-text">As a constructor</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hoisting"><span class="nav-number">1.9.</span> <span class="nav-text">Hoisting</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"></span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://bxian.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/';
+          this.page.identifier = '2018/02/10/Javascript-ExecutionContext/';
+          this.page.title = 'Javascript_ExecutionContext';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://bxian.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

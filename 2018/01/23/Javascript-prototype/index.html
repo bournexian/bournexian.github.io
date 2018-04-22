@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Javascript," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blog of BourneXian" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Javascript Prototype捣鼓过Docker之后，接着开个坑，打算跟着cnblog上面一些文章和MDN的参考资料学习下JS或者说前端方面，这里是第一篇：JS原型。 References:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain http://w">
+<meta name="keywords" content="Javascript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Javascript_prototype">
+<meta property="og:url" content="https://bournexian.github.io/2018/01/23/Javascript-prototype/index.html">
+<meta property="og:site_name" content="Blog of BourneXian">
+<meta property="og:description" content="Javascript Prototype捣鼓过Docker之后，接着开个坑，打算跟着cnblog上面一些文章和MDN的参考资料学习下JS或者说前端方面，这里是第一篇：JS原型。 References:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain http://w">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://bournexian.github.io/2018/01/23/Javascript-prototype/JS__proto__.png">
+<meta property="og:image" content="https://bournexian.github.io/2018/01/23/Javascript-prototype/prototype_chain.png">
+<meta property="og:updated_time" content="2018-01-26T14:27:22.999Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Javascript_prototype">
+<meta name="twitter:description" content="Javascript Prototype捣鼓过Docker之后，接着开个坑，打算跟着cnblog上面一些文章和MDN的参考资料学习下JS或者说前端方面，这里是第一篇：JS原型。 References:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain http://w">
+<meta name="twitter:image" content="https://bournexian.github.io/2018/01/23/Javascript-prototype/JS__proto__.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bournexian.github.io/2018/01/23/Javascript-prototype/"/>
+
+
+
+
+
+  <title>Javascript_prototype | Blog of BourneXian</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blog of BourneXian</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://bournexian.github.io/2018/01/23/Javascript-prototype/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blog of BourneXian">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Javascript_prototype</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-23T22:25:53+08:00">
+                2018-01-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/01/23/Javascript-prototype/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/01/23/Javascript-prototype/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="Javascript-Prototype"><a href="#Javascript-Prototype" class="headerlink" title="Javascript Prototype"></a>Javascript Prototype</h3><p>捣鼓过Docker之后，接着开个坑，打算跟着cnblog上面一些文章和MDN的参考资料学习下JS或者说前端方面，这里是第一篇：JS原型。</p>
+<h3 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h3><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain</a></p>
+<p><a href="http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html" target="_blank" rel="external">http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html</a></p>
+<p><a href="http://www.xiaojichao.com/post/jscorev2.html" target="_blank" rel="external">http://www.xiaojichao.com/post/jscorev2.html</a></p>
+<h4 id="Inheritance"><a href="#Inheritance" class="headerlink" title="Inheritance"></a>Inheritance</h4><p>为什么需要继承？<br>举个例子有猫和狗两种动物，可以定义两个类Cat和Dog分别代表这两种动物，而每个动物都有体重，高度，毛色等特征，那么是否需要在各个类里面定义这些属性呢？<br>这时候就可以通过把共有的属性集成到基类Animal里面，其它动物只需要继承Animal就可以了，减少了重复代码增加了可维护性。</p>
+<p>在Javascript中是如何实现继承的呢？ 答案是通过prototype（原型）。</p>
+<h4 id="Prototype-Chain-amp-Inheriting-properties"><a href="#Prototype-Chain-amp-Inheriting-properties" class="headerlink" title="Prototype Chain &amp; Inheriting properties"></a>Prototype Chain &amp; Inheriting properties</h4><p>和Java或者C#等语言基于类继承不同，Javascript是基于prototype（原型）来实现继承的。<br>每个对象都拥有一个私有属性来保存一个连接到另一个对象，这里面的“另一个对象”就是当前对象的原型。  而那个原型对象本身也是对象，也有它自己的原型，所以就会形成一个原型链，知道最后原型是null结束。</p>
+<p>在ECMAScript里面，保存连接的私有对象是 [[Prototype]], 但是由于它是私有的不能直接访问。其中一个非标准实现是通过大多浏览器实现的__proto__属性来访问， 或者在ES2015以后版本可以通过Object.getPrototypeOf() 和 Object.setPrototypeOf() 来获取或者设置原型。</p>
+<p><img src="/2018/01/23/Javascript-prototype/JS__proto__.png" alt="JS__proto__.png"></p>
+<p>上面例子是创建一个Object o，并赋予两个属性a和b。 通过__proto__获取原型对象，可见通过括号这种方式新建对象的原型是Object.prototype。</p>
+<p><img src="/2018/01/23/Javascript-prototype/prototype_chain.png" alt="prototype_chain.png"></p>
+<p>而上面例子是在第一个例子的基础上，定义一个Object j，赋予属性b和c， 并把o的原型指向j。 当o.c执行时，在当前对象属性找不到c，会到对象的原型上去找，发现o的原型j上有定义c并且值为4，故返回4。 当执行o.b时，由于当前对象已经定义了b的值，故直接返回2而不会继续搜索原型链。 同时j自己也有原型是Object.prototype, 而Object.prototype自己的原型则是null，原型链至此结束。 整条原型链搜索过程可以用符号表示为：<br>    o —&gt; j —&gt; Object.prototype —&gt; null</p>
+<p>假如访问一个属性(举个例子使用代码o.d访问属性名d)，在原型链搜索完后仍未找到，则会返回undefined。</p>
+<blockquote>
+<p>NOTE: 假如不想访问原型链上面的属性，只访问定义在当前对象的属性，可以使用hasOwnProperty方法或getOwnPropertyNames方法。 hasOwnProperty方法定义在Object.prototype上而默认对象原型会从那里继承，故一般可以直接使用. 下面是一个使用hasOwnProperty的遍历当前对象可枚举属性的例子 以及 使用getOwnPropertyNames的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> property <span class="keyword">in</span> obj) <span class="comment">//for...in loop only iterate the enumerable items</span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (obj.hasOwnProperty(property))</div><div class="line">    &#123;</div><div class="line">        <span class="comment">//properities defined under obj directly</span></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//sample 2 get own peroperties by 'getOwnPropertyNames' function</span></div><div class="line"><span class="built_in">Object</span>.getOwnPropertyNames(obj)</div><div class="line"><span class="comment">//The Object.getOwnPropertyNames() method returns an array of all properties (including non-enumerable properties except for those which use Symbol) found directly upon a given object.</span></div></pre></td></tr></table></figure></p>
+</blockquote>
+<h4 id="Inheriting-“methods”"><a href="#Inheriting-“methods”" class="headerlink" title="Inheriting “methods”"></a>Inheriting “methods”</h4><p>和继承属性类似，方法也可以被继承。在Javascript中，方法可以作为属性添加到对象中。<br>下面引用MDN的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = &#123;</div><div class="line">   a: <span class="number">2</span>,</div><div class="line">   m: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.a + <span class="number">1</span>;</div><div class="line">    &#125; </div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(o.m()); <span class="comment">// 3</span></div><div class="line"><span class="comment">// When calling o.m in this case, 'this' refers to o</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> p = <span class="built_in">Object</span>.create(o);</div><div class="line"><span class="comment">// p is an object that inherits from o</span></div><div class="line"></div><div class="line">p.a = <span class="number">4</span>; <span class="comment">// creates a property 'a' on p</span></div><div class="line"><span class="built_in">console</span>.log(p.m()); <span class="comment">// 5</span></div></pre></td></tr></table></figure></p>
+<p>这个例子是举例p是从o继承的，所以也能访问o定义的方法。 至于Object.create()方法是除了__proto__属性外设置对象原型的方法， 它会返回一个新对象，并且新对象是以传入的第一个参数作为原型的，在本例中p是以o作为原型。  而this是会指向构造函数创建的新对象，在这个例子中就是指代p，所以p.m()结果是5。 这个this会在后面的进行更深入的了解。</p>
+<blockquote>
+<p>NOTE: 通常不显式指定原型的话，都会以Object.prototype作为默认原型，而想要一个新对象不从任何对象继承的话，可以使用 <code>Object.create(null)</code>.</p>
+</blockquote>
+<h3 id="Different-prototype-chain-when-create-object-in-different-ways"><a href="#Different-prototype-chain-when-create-object-in-different-ways" class="headerlink" title="Different prototype chain when create object in different ways"></a>Different prototype chain when create object in different ways</h3><h4 id="Object-created-with-different-syntax"><a href="#Object-created-with-different-syntax" class="headerlink" title="Object created with different syntax"></a>Object created with different syntax</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = &#123;<span class="attr">a</span>: <span class="number">1</span>&#125;;</div><div class="line"><span class="comment">//o ---&gt; Object.prototype ---&gt; null</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> b = [<span class="string">'a'</span>, <span class="string">'b'</span>]</div><div class="line"><span class="comment">// b ---&gt; Array.prototype ---&gt; Object.prototype ---&gt; null</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">c</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">&#125;</div><div class="line"><span class="comment">// c ---&gt; Function.prototype ---&gt; Object.prototype ---&gt; null</span></div></pre></td></tr></table></figure>
+<p>简而言之就是使用不同的语法来创建对象，会有不同的效果，原型链也不一样。</p>
+<h4 id="Create-Object-with-a-constructor"><a href="#Create-Object-with-a-constructor" class="headerlink" title="Create Object with a constructor"></a>Create Object with a constructor</h4><p>在JS语言里面，”函数是第一等公民”, 函数本身也是一个对象，而构造函数就是普通的JS函数，只不过加上new操作符。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Graph</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.vertices = [];</div><div class="line">    <span class="keyword">this</span>.edges = [];</div><div class="line">&#125;</div><div class="line"></div><div class="line">Graph.prototype = &#123;</div><div class="line">    addVertex: <span class="function"><span class="keyword">function</span>(<span class="params">v</span>) </span>&#123;</div><div class="line">        <span class="keyword">this</span>.vertices.push(v);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> g = <span class="keyword">new</span> Graph();</div><div class="line"><span class="comment">// g ---&gt; Graph.prototype ---&gt; Object.prototype ---&gt; null</span></div><div class="line"><span class="comment">// Graph ---&gt; Function.prototype ---&gt; Object.prototype ---&gt; null</span></div></pre></td></tr></table></figure>
+<p>上面例子中，g是new出来的，也就是Graph的一个实例。 值得注意的是Graph函数本身也是对象，所以它本身也会有原型。</p>
+<blockquote>
+<p>NOTE: 实际上new运算符会： </p>
+<ol>
+<li>创建新的空对象 </li>
+<li>把this绑定到新对象 </li>
+<li>给新创建的对象添加__proto__属性，指向构造函数的原型对象 </li>
+<li>给函数末尾添加一条return this语句，使被创建的对象从函数返回。</li>
+</ol>
+</blockquote>
+<h4 id="With-Object-create"><a href="#With-Object-create" class="headerlink" title="With Object.create"></a>With Object.create</h4><p>这Object.create可以指定新对象的原型， 和上面Inheriting “methods”例子类似，就不赘述。</p>
+<h4 id="With-class-keyword"><a href="#With-class-keyword" class="headerlink" title="With class keyword"></a>With class keyword</h4><p>ES2015支持了新的关键字，class，constructor，static，extends，super。这些关键字可以理解为语法糖，背后继承的实现仍然是基于原型链的。 下面是MDN给出的例子，有空再学习下ECS2015的新语法。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="meta">'use strict'</span>;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Polygon</span> </span>&#123;</div><div class="line"><span class="keyword">constructor</span>(height, width) &#123;</div><div class="line">    <span class="keyword">this</span>.height = height;</div><div class="line">    <span class="keyword">this</span>.width = width;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Square</span> <span class="keyword">extends</span> <span class="title">Polygon</span> </span>&#123;</div><div class="line"><span class="keyword">constructor</span>(sideLength) &#123;</div><div class="line">    <span class="keyword">super</span>(sideLength, sideLength);</div><div class="line">&#125;</div><div class="line">get area() &#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.height * <span class="keyword">this</span>.width;</div><div class="line">&#125;</div><div class="line">set sideLength(newLength) &#123;</div><div class="line">    <span class="keyword">this</span>.height = newLength;</div><div class="line">    <span class="keyword">this</span>.width = newLength;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> square = <span class="keyword">new</span> Square(<span class="number">2</span>);</div></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Javascript/" rel="tag"># Javascript</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/28/Docker-Swarm/" rel="next" title="Docker-Swarm">
+                <i class="fa fa-chevron-left"></i> Docker-Swarm
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/10/Javascript-ExecutionContext/" rel="prev" title="Javascript_ExecutionContext">
+                Javascript_ExecutionContext <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Javascript-Prototype"><span class="nav-number">1.</span> <span class="nav-text">Javascript Prototype</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#References"><span class="nav-number">2.</span> <span class="nav-text">References:</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Inheritance"><span class="nav-number">2.1.</span> <span class="nav-text">Inheritance</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Prototype-Chain-amp-Inheriting-properties"><span class="nav-number">2.2.</span> <span class="nav-text">Prototype Chain & Inheriting properties</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Inheriting-“methods”"><span class="nav-number">2.3.</span> <span class="nav-text">Inheriting “methods”</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Different-prototype-chain-when-create-object-in-different-ways"><span class="nav-number">3.</span> <span class="nav-text">Different prototype chain when create object in different ways</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Object-created-with-different-syntax"><span class="nav-number">3.1.</span> <span class="nav-text">Object created with different syntax</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Create-Object-with-a-constructor"><span class="nav-number">3.2.</span> <span class="nav-text">Create Object with a constructor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#With-Object-create"><span class="nav-number">3.3.</span> <span class="nav-text">With Object.create</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#With-class-keyword"><span class="nav-number">3.4.</span> <span class="nav-text">With class keyword</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"></span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://bxian.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://bournexian.github.io/2018/01/23/Javascript-prototype/';
+          this.page.identifier = '2018/01/23/Javascript-prototype/';
+          this.page.title = 'Javascript_prototype';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://bxian.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

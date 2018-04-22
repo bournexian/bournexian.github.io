@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="angular," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blog of BourneXian" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Learning Angular记录下学习angular中遇到的一些知识点。 @Input &amp;amp; @Output父组件向子组件传递，通过属性传递数据。子组件向父组件传递，通过事件传递数据。在angular中，这个通过装饰器@Input和@Output实现。 app.component.html123&amp;lt;app-counter [count]=&quot;initialCount&quot; (countCh">
+<meta name="keywords" content="angular">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Learning Angular">
+<meta property="og:url" content="https://bournexian.github.io/2018/04/21/angular-post1/index.html">
+<meta property="og:site_name" content="Blog of BourneXian">
+<meta property="og:description" content="Learning Angular记录下学习angular中遇到的一些知识点。 @Input &amp;amp; @Output父组件向子组件传递，通过属性传递数据。子组件向父组件传递，通过事件传递数据。在angular中，这个通过装饰器@Input和@Output实现。 app.component.html123&amp;lt;app-counter [count]=&quot;initialCount&quot; (countCh">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-22T04:06:20.162Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Learning Angular">
+<meta name="twitter:description" content="Learning Angular记录下学习angular中遇到的一些知识点。 @Input &amp;amp; @Output父组件向子组件传递，通过属性传递数据。子组件向父组件传递，通过事件传递数据。在angular中，这个通过装饰器@Input和@Output实现。 app.component.html123&amp;lt;app-counter [count]=&quot;initialCount&quot; (countCh">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bournexian.github.io/2018/04/21/angular-post1/"/>
+
+
+
+
+
+  <title>Learning Angular | Blog of BourneXian</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blog of BourneXian</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://bournexian.github.io/2018/04/21/angular-post1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blog of BourneXian">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Learning Angular</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-21T21:07:41+08:00">
+                2018-04-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/21/angular-post1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/04/21/angular-post1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="Learning-Angular"><a href="#Learning-Angular" class="headerlink" title="Learning Angular"></a>Learning Angular</h2><p>记录下学习angular中遇到的一些知识点。</p>
+<h3 id="Input-amp-Output"><a href="#Input-amp-Output" class="headerlink" title="@Input &amp; @Output"></a>@Input &amp; @Output</h3><p>父组件向子组件传递，通过属性传递数据。<br>子组件向父组件传递，通过事件传递数据。<br>在angular中，这个通过装饰器@Input和@Output实现。</p>
+<p>app.component.html<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">app-counter</span> [<span class="attr">count</span>]=<span class="string">"initialCount"</span> (<span class="attr">countChange</span>)=<span class="string">"initialCount=$event"</span>&gt;</span><span class="tag">&lt;/<span class="name">app-counter</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> (<span class="attr">click</span>)=<span class="string">"go()"</span>&gt;</span>Go<span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>parent: &#123;&#123;initialCount&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>app.component.ts<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">AppComponent</span> </span>&#123;</div><div class="line">  initialCount: number = <span class="number">10</span>;</div><div class="line">  changeMsg: string;</div><div class="line">  go()&#123;</div><div class="line">    <span class="keyword">this</span>.initialCount++; <span class="comment">// will trigger child component ngOnChanges lifecycle hook</span></div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>counter.component.ts<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">CounterComponent</span> <span class="title">implements</span> <span class="title">OnInit</span>, <span class="title">OnChanges</span> </span>&#123;</div><div class="line">@Input() count: number = <span class="number">0</span>;</div><div class="line">@Output() countChange = <span class="keyword">new</span> EventEmitter&lt;number&gt;();</div><div class="line"></div><div class="line">  <span class="comment">//sequence is constructor -&gt; ngOnChanges -&gt; ngOnInit</span></div><div class="line">  <span class="keyword">constructor</span>() &#123; &#125;</div><div class="line"></div><div class="line">  ngOnChanges(changes)&#123;</div><div class="line">    <span class="built_in">console</span>.dir(changes[<span class="string">'count'</span>]);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  ngOnInit() &#123;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  increment()&#123;</div><div class="line">    <span class="comment">//it won't trigger the ngOnChanges</span></div><div class="line">    <span class="keyword">this</span>.count++;</div><div class="line">    <span class="keyword">this</span>.countChange.emit(<span class="keyword">this</span>.count);</div><div class="line">  &#125;</div><div class="line">  decrement()&#123;</div><div class="line">    <span class="comment">//it won't trigger the ngOnChanges</span></div><div class="line">    <span class="keyword">this</span>.count--;</div><div class="line">    <span class="keyword">this</span>.countChange.emit(<span class="keyword">this</span>.count);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="Two-Way-Binding"><a href="#Two-Way-Binding" class="headerlink" title="Two-Way Binding"></a>Two-Way Binding</h3><p>可以通过Banana in the box 写法，[()]<br>如下面的两个写法效果一致， 当采用这种写法，expect child component会有@Input() count和@Output() countChange的输入属性及输出事件定义。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">app-counter</span> [<span class="attr">count</span>]=<span class="string">"initialCount"</span> (<span class="attr">countChange</span>)=<span class="string">"initialCount=$event"</span>&gt;</span><span class="tag">&lt;/<span class="name">app-counter</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">app-counter</span> [(<span class="attr">count</span>)]=<span class="string">"initialCount"</span>&gt;</span><span class="tag">&lt;/<span class="name">app-counter</span>&gt;</span> --two way binding</div></pre></td></tr></table></figure>
+<h3 id="Decorators"><a href="#Decorators" class="headerlink" title="Decorators"></a>Decorators</h3><p>搜了下，装饰器语法是新版ECMAScript的一个提案，不确定是否已经成为标准。<br>TypeScript已经支持了装饰器写法，如下代码所示，支持类，属性，方法，参数等装饰器:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">declare type ClassDecorator = <span class="xml"><span class="tag">&lt;<span class="name">TFunction</span> <span class="attr">extends</span> <span class="attr">Function</span>&gt;</span>(target: TFunction) =&gt; TFunction | void;</span></div><div class="line"><span class="xml">declare type PropertyDecorator = (target: Object, propertyKey: string | symbol) =&gt; void;</span></div><div class="line">declare type MethodDecorator = &lt;T&gt;(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor&lt;T&gt;) =&gt; TypedPropertyDescriptor&lt;T&gt; | void;</div><div class="line">declare type ParameterDecorator = (target: Object, propertyKey: string | symbol, parameterIndex: number) =&gt; void;</div></pre></td></tr></table></figure>
+<p>上面使用的@Input, @Output等都是属性装饰器，除了装饰器的写法外，还能在@Component里写上inputs或outputs数组来替代，下面再举个例子，使用方法装饰器记录函数执行的结果：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Log</span>(<span class="params">tarage: Function, key: string, descriptor: any</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> originalMethod = descriptor.value;</div><div class="line">  <span class="keyword">var</span> newMethod = <span class="function"><span class="keyword">function</span>(<span class="params">...args: any[]</span>): <span class="title">any</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> result: any = originalMethod.apply(<span class="keyword">this</span>, args);</div><div class="line">    <span class="keyword">this</span>.loggedResult = <span class="string">'logged result：'</span> + result;</div><div class="line">  &#125;;</div><div class="line">  descriptor.value = newMethod;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Greeting</span> </span>&#123;</div><div class="line">  <span class="keyword">constructor</span>() &#123;</div><div class="line">    &#125;</div><div class="line">    @Log</div><div class="line">    func() &#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">'original result'</span>;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">let</span> myGreeting = <span class="keyword">new</span> Greeting();</div><div class="line">myGreeting.func();</div><div class="line"><span class="built_in">console</span>.log(myGreeting.loggedResult);</div></pre></td></tr></table></figure></p>
+<p>这种AOP编程令到我们可以更容易地重用代码， 比如对废弃的方法可以加上@deprecated装饰。</p>
+<h4 id="Sample-code"><a href="#Sample-code" class="headerlink" title="Sample code:"></a>Sample code:</h4><p><a href="https://github.com/bournexian/ng/tree/master/counter" target="_blank" rel="external">https://github.com/bournexian/ng/tree/master/counter</a></p>
+<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h4><p><a href="https://segmentfault.com/a/1190000008754631" target="_blank" rel="external">https://segmentfault.com/a/1190000008754631</a><br><a href="https://segmentfault.com/p/1210000009968000/read" target="_blank" rel="external">https://segmentfault.com/p/1210000009968000/read</a><br><a href="http://byevil.com/2016/01/31/what-is-decorator-in-javascript/" target="_blank" rel="external">http://byevil.com/2016/01/31/what-is-decorator-in-javascript/</a><br><a href="http://taobaofed.org/blog/2017/04/27/building-consistent-api-with-es-decorators/" target="_blank" rel="external">http://taobaofed.org/blog/2017/04/27/building-consistent-api-with-es-decorators/</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/angular/" rel="tag"># angular</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/10/Javascript-ExecutionContext/" rel="next" title="Javascript_ExecutionContext">
+                <i class="fa fa-chevron-left"></i> Javascript_ExecutionContext
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Learning-Angular"><span class="nav-number">1.</span> <span class="nav-text">Learning Angular</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Input-amp-Output"><span class="nav-number">1.1.</span> <span class="nav-text">@Input & @Output</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Two-Way-Binding"><span class="nav-number">1.2.</span> <span class="nav-text">Two-Way Binding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Decorators"><span class="nav-number">1.3.</span> <span class="nav-text">Decorators</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Sample-code"><span class="nav-number">1.3.1.</span> <span class="nav-text">Sample code:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Reference"><span class="nav-number">1.3.2.</span> <span class="nav-text">Reference:</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"></span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://bxian.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://bournexian.github.io/2018/04/21/angular-post1/';
+          this.page.identifier = '2018/04/21/angular-post1/';
+          this.page.title = 'Learning Angular';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://bxian.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

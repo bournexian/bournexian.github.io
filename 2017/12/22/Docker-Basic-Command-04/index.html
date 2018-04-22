@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="docker," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Blog of BourneXian" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="DOCKER BASIC COMMAND – Bind Mount &amp;amp; Tmpfs除了常用的volume外，还有bind mounts以及tmpfs两种方式存储数据； 在concepts那篇文章简单介绍过，bind mount类似于link，把host主机的目录挂载到container内， 而tmpfs则存储在内存中，用于存放临时数据。 下面直接试试用法。 Bind mount在docke">
+<meta name="keywords" content="docker">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker-Basic-Command-04">
+<meta property="og:url" content="https://bournexian.github.io/2017/12/22/Docker-Basic-Command-04/index.html">
+<meta property="og:site_name" content="Blog of BourneXian">
+<meta property="og:description" content="DOCKER BASIC COMMAND – Bind Mount &amp;amp; Tmpfs除了常用的volume外，还有bind mounts以及tmpfs两种方式存储数据； 在concepts那篇文章简单介绍过，bind mount类似于link，把host主机的目录挂载到container内， 而tmpfs则存储在内存中，用于存放临时数据。 下面直接试试用法。 Bind mount在docke">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://bournexian.github.io/2017/12/22/Docker-Basic-Command-04/bind_mount_target_diralreadyexists.png">
+<meta property="og:updated_time" content="2017-12-23T14:34:21.097Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Docker-Basic-Command-04">
+<meta name="twitter:description" content="DOCKER BASIC COMMAND – Bind Mount &amp;amp; Tmpfs除了常用的volume外，还有bind mounts以及tmpfs两种方式存储数据； 在concepts那篇文章简单介绍过，bind mount类似于link，把host主机的目录挂载到container内， 而tmpfs则存储在内存中，用于存放临时数据。 下面直接试试用法。 Bind mount在docke">
+<meta name="twitter:image" content="https://bournexian.github.io/2017/12/22/Docker-Basic-Command-04/bind_mount_target_diralreadyexists.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://bournexian.github.io/2017/12/22/Docker-Basic-Command-04/"/>
+
+
+
+
+
+  <title>Docker-Basic-Command-04 | Blog of BourneXian</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Blog of BourneXian</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="https://bournexian.github.io/2017/12/22/Docker-Basic-Command-04/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Blog of BourneXian">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Docker-Basic-Command-04</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-22T15:48:13+08:00">
+                2017-12-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/12/22/Docker-Basic-Command-04/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/12/22/Docker-Basic-Command-04/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="DOCKER-BASIC-COMMAND-–-Bind-Mount-amp-Tmpfs"><a href="#DOCKER-BASIC-COMMAND-–-Bind-Mount-amp-Tmpfs" class="headerlink" title="DOCKER BASIC COMMAND – Bind Mount &amp; Tmpfs"></a>DOCKER BASIC COMMAND – Bind Mount &amp; Tmpfs</h3><p>除了常用的volume外，还有bind mounts以及tmpfs两种方式存储数据； 在concepts那篇文章简单介绍过，bind mount类似于link，把host主机的目录挂载到container内， 而tmpfs则存储在内存中，用于存放临时数据。 下面直接试试用法。</p>
+<h4 id="Bind-mount"><a href="#Bind-mount" class="headerlink" title="Bind mount"></a>Bind mount</h4><p>在docker 17.06后，对于挂载volume或者bind mount，推荐使用–mount参数，而以前的-v参数暂时仍保留。<br>Bind mount不像volume可以单独创建，必须和容器关联使用，而且依赖于host机器的文件系统有特定的目录结构，和volume类似。<br>官网说几个地方跟我实际操作有一点差异，</p>
+<blockquote>
+<p>  When you use a bind mount, a file or directory on the host machine is mounted into a container. The file or directory is referenced by its full or relative path on the host machine. By contrast, when you use a volume, a new directory is created within Docker’s storage directory on the host machine, and Docker manages that directory’s contents.</p>
+</blockquote>
+<p>这里说文件或目录是通过host machine的full/relative path关联，但是注意的是实际使用命令的时候要指定full path, 否则报这个错: invalid mount path: ‘./target’ mount path must be absolute.</p>
+<blockquote>
+<p>  The file or directory does not need to exist on the Docker host already. It is created on demand if it does not yet exist. </p>
+</blockquote>
+<p>第二个，这里说文件或目录不需要已经存在，如果不存在的话会即时创建。 但实际上操作会遇到错误： bind source path does not exist.  不清楚我哪里的操作有问题，或者跟使用的docker版本有关。</p>
+<p>下面例子是运行一个container，并为host主机当前目录下面的target目录创建bind mount，mapping到容器里的/app目录：</p>
+<pre><code>$ docker run -d \
+-it \
+--name devtest \
+--mount type=bind,source=&quot;$(pwd)&quot;/target,target=/app \
+busybox:latest
+</code></pre><p>这里解释下$(pwd)的意思是执行pwd命令，就是获取当前working directory的路径。<br>使用docker inspect devtest，可以查看到Mounts section判别Type为“bind”即为bind mount。</p>
+<pre><code>&quot;Mounts&quot;: [
+        {
+            &quot;Type&quot;: &quot;bind&quot;,
+            &quot;Source&quot;: &quot;/root/target&quot;,
+            &quot;Destination&quot;: &quot;/app&quot;,
+            &quot;Mode&quot;: &quot;&quot;,
+            &quot;RW&quot;: true,
+            &quot;Propagation&quot;: &quot;rprivate&quot;
+        }
+    ],
+</code></pre><p>值得注意的是，假如container里挂载的目录已经有数据，那么将会把目标目录清空，举个极端的例子，假如把/root/target目录挂载到容器的/usr目录，/usr目录的内容会被清空：</p>
+<p><img src="/2017/12/22/Docker-Basic-Command-04/bind_mount_target_diralreadyexists.png" alt="bind_mount_target_diralreadyexists"></p>
+<p>另外可以配置bind mount的挂载选项，比如只读，加上flag readonly即可；<br>同时细心的会发现bind mount跟volume相比，少了“Driver”而多出一个”Propagation”。 Driver是volume独有的，可能是因为bind mount是依赖于宿主机的文件系统，无法定义storage driver。 而propagation这个是跟mount相关的，比如目标机器挂载了 /mnt, 同时这个目录也挂载到了 /tmp. Propagation 设置会决定是否会在挂载/tmp/a的同时允许/mnt/a同时也自动挂载上。 这个propagation算是比较进阶的技能，详细的可以查看文档。</p>
+<h4 id="Tmpfs"><a href="#Tmpfs" class="headerlink" title="Tmpfs"></a>Tmpfs</h4><p>当要保存一些一次性数据的时候，可以使用tmpfs，但要注意的是tmpfs有一些局限性：</p>
+<ul>
+<li>tmpfs mounts cannot be shared among containers.</li>
+<li>tmpfs mounts only work on Linux containers, and not on Windows containers.</li>
+</ul>
+<p>而具体例子如下，因为使用宿主机的内存(或swap)，运行container的时候只需要指定容器内的挂载目录即可：</p>
+<pre><code>docker run -d \
+-it \
+--name tmptest \
+--mount type=tmpfs,destination=/app \
+busybox
+</code></pre><p>还有一些options可以指定：</p>
+<ul>
+<li><p>tmpfs-size<br>Size of the tmpfs mount in bytes. Unlimited by default.</p>
+</li>
+<li><p>tmpfs-mode<br>File mode of the tmpfs in octal. For instance, 700 or 0770. Defaults to 1777 or world-writable.</p>
+</li>
+</ul>
+<h4 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h4><p>至此Docker storage方面的三个重要功能都过了一遍， 接下来会试试Docker services, swarm, stack等进阶命令。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/docker/" rel="tag"># docker</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/18/Docker-Basic-Command-03/" rel="next" title="Docker-Basic-Command-03">
+                <i class="fa fa-chevron-left"></i> Docker-Basic-Command-03
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/23/Docker-Services/" rel="prev" title="Docker Services">
+                Docker Services <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="" />
+          <p class="site-author-name" itemprop="name"></p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#DOCKER-BASIC-COMMAND-–-Bind-Mount-amp-Tmpfs"><span class="nav-number">1.</span> <span class="nav-text">DOCKER BASIC COMMAND – Bind Mount & Tmpfs</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Bind-mount"><span class="nav-number">1.1.</span> <span class="nav-text">Bind mount</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Tmpfs"><span class="nav-number">1.2.</span> <span class="nav-text">Tmpfs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Conclusion"><span class="nav-number">1.3.</span> <span class="nav-text">Conclusion</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder"></span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://bxian.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'https://bournexian.github.io/2017/12/22/Docker-Basic-Command-04/';
+          this.page.identifier = '2017/12/22/Docker-Basic-Command-04/';
+          this.page.title = 'Docker-Basic-Command-04';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://bxian.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+
+  
+
+  
+
+</body>
+</html>

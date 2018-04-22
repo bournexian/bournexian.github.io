@@ -1,0 +1,1152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Blog of BourneXian</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://bournexian.github.io/"/>
+  <updated>2018-04-22T04:06:20.162Z</updated>
+  <id>https://bournexian.github.io/</id>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Learning Angular</title>
+    <link href="https://bournexian.github.io/2018/04/21/angular-post1/"/>
+    <id>https://bournexian.github.io/2018/04/21/angular-post1/</id>
+    <published>2018-04-21T13:07:41.000Z</published>
+    <updated>2018-04-22T04:06:20.162Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Learning-Angular"><a href="#Learning-Angular" class="headerlink" title="Learning Angular"></a>Learning Angular</h2><p>记录下学习angular中遇到的一些知识点。</p>
+<h3 id="Input-amp-Output"><a href="#Input-amp-Output" class="headerlink" title="@Input &amp; @Output"></a>@Input &amp; @Output</h3><p>父组件向子组件传递，通过属性传递数据。<br>子组件向父组件传递，通过事件传递数据。<br>在angular中，这个通过装饰器@Input和@Output实现。</p>
+<p>app.component.html<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">app-counter</span> [<span class="attr">count</span>]=<span class="string">"initialCount"</span> (<span class="attr">countChange</span>)=<span class="string">"initialCount=$event"</span>&gt;</span><span class="tag">&lt;/<span class="name">app-counter</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">button</span> (<span class="attr">click</span>)=<span class="string">"go()"</span>&gt;</span>Go<span class="tag">&lt;/<span class="name">button</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">p</span>&gt;</span>parent: &#123;&#123;initialCount&#125;&#125;<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>app.component.ts<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">AppComponent</span> </span>&#123;</div><div class="line">  initialCount: number = <span class="number">10</span>;</div><div class="line">  changeMsg: string;</div><div class="line">  go()&#123;</div><div class="line">    <span class="keyword">this</span>.initialCount++; <span class="comment">// will trigger child component ngOnChanges lifecycle hook</span></div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>counter.component.ts<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">export</span> <span class="class"><span class="keyword">class</span> <span class="title">CounterComponent</span> <span class="title">implements</span> <span class="title">OnInit</span>, <span class="title">OnChanges</span> </span>&#123;</div><div class="line">@Input() count: number = <span class="number">0</span>;</div><div class="line">@Output() countChange = <span class="keyword">new</span> EventEmitter&lt;number&gt;();</div><div class="line"></div><div class="line">  <span class="comment">//sequence is constructor -&gt; ngOnChanges -&gt; ngOnInit</span></div><div class="line">  <span class="keyword">constructor</span>() &#123; &#125;</div><div class="line"></div><div class="line">  ngOnChanges(changes)&#123;</div><div class="line">    <span class="built_in">console</span>.dir(changes[<span class="string">'count'</span>]);</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  ngOnInit() &#123;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  increment()&#123;</div><div class="line">    <span class="comment">//it won't trigger the ngOnChanges</span></div><div class="line">    <span class="keyword">this</span>.count++;</div><div class="line">    <span class="keyword">this</span>.countChange.emit(<span class="keyword">this</span>.count);</div><div class="line">  &#125;</div><div class="line">  decrement()&#123;</div><div class="line">    <span class="comment">//it won't trigger the ngOnChanges</span></div><div class="line">    <span class="keyword">this</span>.count--;</div><div class="line">    <span class="keyword">this</span>.countChange.emit(<span class="keyword">this</span>.count);</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h3 id="Two-Way-Binding"><a href="#Two-Way-Binding" class="headerlink" title="Two-Way Binding"></a>Two-Way Binding</h3><p>可以通过Banana in the box 写法，[()]<br>如下面的两个写法效果一致， 当采用这种写法，expect child component会有@Input() count和@Output() countChange的输入属性及输出事件定义。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">app-counter</span> [<span class="attr">count</span>]=<span class="string">"initialCount"</span> (<span class="attr">countChange</span>)=<span class="string">"initialCount=$event"</span>&gt;</span><span class="tag">&lt;/<span class="name">app-counter</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">app-counter</span> [(<span class="attr">count</span>)]=<span class="string">"initialCount"</span>&gt;</span><span class="tag">&lt;/<span class="name">app-counter</span>&gt;</span> --two way binding</div></pre></td></tr></table></figure>
+<h3 id="Decorators"><a href="#Decorators" class="headerlink" title="Decorators"></a>Decorators</h3><p>搜了下，装饰器语法是新版ECMAScript的一个提案，不确定是否已经成为标准。<br>TypeScript已经支持了装饰器写法，如下代码所示，支持类，属性，方法，参数等装饰器:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">declare type ClassDecorator = <span class="xml"><span class="tag">&lt;<span class="name">TFunction</span> <span class="attr">extends</span> <span class="attr">Function</span>&gt;</span>(target: TFunction) =&gt; TFunction | void;</span></div><div class="line"><span class="xml">declare type PropertyDecorator = (target: Object, propertyKey: string | symbol) =&gt; void;</span></div><div class="line">declare type MethodDecorator = &lt;T&gt;(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor&lt;T&gt;) =&gt; TypedPropertyDescriptor&lt;T&gt; | void;</div><div class="line">declare type ParameterDecorator = (target: Object, propertyKey: string | symbol, parameterIndex: number) =&gt; void;</div></pre></td></tr></table></figure>
+<p>上面使用的@Input, @Output等都是属性装饰器，除了装饰器的写法外，还能在@Component里写上inputs或outputs数组来替代，下面再举个例子，使用方法装饰器记录函数执行的结果：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Log</span>(<span class="params">tarage: Function, key: string, descriptor: any</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> originalMethod = descriptor.value;</div><div class="line">  <span class="keyword">var</span> newMethod = <span class="function"><span class="keyword">function</span>(<span class="params">...args: any[]</span>): <span class="title">any</span> </span>&#123;</div><div class="line">    <span class="keyword">var</span> result: any = originalMethod.apply(<span class="keyword">this</span>, args);</div><div class="line">    <span class="keyword">this</span>.loggedResult = <span class="string">'logged result：'</span> + result;</div><div class="line">  &#125;;</div><div class="line">  descriptor.value = newMethod;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Greeting</span> </span>&#123;</div><div class="line">  <span class="keyword">constructor</span>() &#123;</div><div class="line">    &#125;</div><div class="line">    @Log</div><div class="line">    func() &#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">'original result'</span>;</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">let</span> myGreeting = <span class="keyword">new</span> Greeting();</div><div class="line">myGreeting.func();</div><div class="line"><span class="built_in">console</span>.log(myGreeting.loggedResult);</div></pre></td></tr></table></figure></p>
+<p>这种AOP编程令到我们可以更容易地重用代码， 比如对废弃的方法可以加上@deprecated装饰。</p>
+<h4 id="Sample-code"><a href="#Sample-code" class="headerlink" title="Sample code:"></a>Sample code:</h4><p><a href="https://github.com/bournexian/ng/tree/master/counter" target="_blank" rel="external">https://github.com/bournexian/ng/tree/master/counter</a></p>
+<h4 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h4><p><a href="https://segmentfault.com/a/1190000008754631" target="_blank" rel="external">https://segmentfault.com/a/1190000008754631</a><br><a href="https://segmentfault.com/p/1210000009968000/read" target="_blank" rel="external">https://segmentfault.com/p/1210000009968000/read</a><br><a href="http://byevil.com/2016/01/31/what-is-decorator-in-javascript/" target="_blank" rel="external">http://byevil.com/2016/01/31/what-is-decorator-in-javascript/</a><br><a href="http://taobaofed.org/blog/2017/04/27/building-consistent-api-with-es-decorators/" target="_blank" rel="external">http://taobaofed.org/blog/2017/04/27/building-consistent-api-with-es-decorators/</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Learning-Angular&quot;&gt;&lt;a href=&quot;#Learning-Angular&quot; class=&quot;headerlink&quot; title=&quot;Learning Angular&quot;&gt;&lt;/a&gt;Learning Angular&lt;/h2&gt;&lt;p&gt;记录下学习angular中遇
+    
+    </summary>
+    
+    
+      <category term="angular" scheme="https://bournexian.github.io/tags/angular/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Javascript_ExecutionContext</title>
+    <link href="https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/"/>
+    <id>https://bournexian.github.io/2018/02/10/Javascript-ExecutionContext/</id>
+    <published>2018-02-10T13:34:19.000Z</published>
+    <updated>2018-02-10T15:49:59.179Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="Javascript-Execution-Context"><a href="#Javascript-Execution-Context" class="headerlink" title="Javascript Execution Context"></a>Javascript Execution Context</h2><p>上一篇了解完原型，这篇将去了解下执行上下文。下面基于参考资料整理的知识点，同时也会加入一些自己的理解。</p>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference:"></a>Reference:</h3><p><a href="http://davidshariff.com/blog/what-is-the-execution-context-in-javascript/" target="_blank" rel="external">http://davidshariff.com/blog/what-is-the-execution-context-in-javascript/</a></p>
+<p><a href="http://www.xiaojichao.com/post/jscorev2.html" target="_blank" rel="external">http://www.xiaojichao.com/post/jscorev2.html</a></p>
+<p><a href="http://www.cnblogs.com/TomXu/archive/2012/01/13/2308101.html" target="_blank" rel="external">http://www.cnblogs.com/TomXu/archive/2012/01/13/2308101.html</a></p>
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this</a></p>
+<p><a href="https://www.cnblogs.com/zhuzhenwei918/p/6131345.html" target="_blank" rel="external">https://www.cnblogs.com/zhuzhenwei918/p/6131345.html</a></p>
+<h3 id="What-is-the-Execution-Context"><a href="#What-is-the-Execution-Context" class="headerlink" title="What is the Execution Context"></a>What is the Execution Context</h3><p>什么是执行上下文？ 首先顾名思义，执行上下文就是代码执行的环境。 换句话说，当在不同执行上下文里面执行相同的代码，结果有可能不一样。 e.g. this的指向不同导致结果不一样。</p>
+<p>ECMAScript分下面几种代码类型，每种代码都是在其执行上下文中求值。</p>
+<ul>
+<li>全局代码 – 代码执行的默认环境</li>
+<li>函数代码 – 函数体内的代码</li>
+<li>eval代码 – eval函数内包含的文本</li>
+</ul>
+<blockquote>
+<p>NOTE： 模块代码 也算一种？</p>
+</blockquote>
+<p>首先默认有一个Global Context，全局代码在这个全局的上下文里执行。 而当函数被调用的时候，就创建了一个新的执行上下文，并被push到栈顶，同时栈顶指向的就是当前激活的执行上下文。</p>
+<p>有几点值得注意：</p>
+<ul>
+<li>调用另一个上下文的上下文被称为caller，而被调用的上下文被称为callee。</li>
+<li>同一个函数可以创建多个上下文，比如递归调用。</li>
+</ul>
+<h3 id="Execution-Context-Stack"><a href="#Execution-Context-Stack" class="headerlink" title="Execution Context Stack"></a>Execution Context Stack</h3><p>假如定义执行上下文堆栈为数组：<br>    ECStack = []</p>
+<h4 id="global-code"><a href="#global-code" class="headerlink" title="global code"></a>global code</h4><p>那么全局代码执行时，堆栈是这样子的:<br>    ECStack = [globalContext]</p>
+<h4 id="function-code"><a href="#function-code" class="headerlink" title="function code"></a>function code</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    bar()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">bar</span>(<span class="params"></span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    baz()</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">baz</span>(<span class="params"></span>)</span>&#123;&#125;</div></pre></td></tr></table></figure>
+<p>上下文堆栈的变化过程依次为：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">ECStack = [globalContext]</div><div class="line"><span class="comment">//进入foo函数时的执行上下文栈， 该执行上下文被激活</span></div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext]</div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext, &lt;bar&gt; functionContext]</div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext, &lt;bar&gt; functionContext, &lt;baz&gt; functionContext]</div><div class="line"><span class="comment">//退出baz函数，根据FILO原则，栈顶的baz退出栈</span></div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext, &lt;bar&gt; functionContext]</div><div class="line">ECStack = [globalContext, &lt;foo&gt; functionContext]</div><div class="line">ECStack = [globalContext]</div></pre></td></tr></table></figure></p>
+<blockquote>
+<p>NOTE: 有些对象，比如generator，可能会违反栈的LIFO顺序。一个generator函数可能会挂起其正在执行的上下文，并在结束前将其从栈中删除。一旦generator再次激活，它上下文就被回复，并再次压入栈中：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> *<span class="title">gen</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">yield</span> <span class="number">1</span>;</div><div class="line">  <span class="keyword">return</span> <span class="number">2</span>;</div><div class="line">&#125;</div><div class="line"><span class="keyword">let</span> g = gen();</div><div class="line"><span class="built_in">console</span>.log(</div><div class="line">  g.next().value, <span class="comment">// 1</span></div><div class="line">  g.next().value, <span class="comment">// 2</span></div><div class="line">);</div></pre></td></tr></table></figure></p>
+</blockquote>
+<h4 id="eval-code"><a href="#eval-code" class="headerlink" title="eval code"></a>eval code</h4><p>这里有个新概念，eval调用的时候产生的上下文被称为调用上下文(calling context)，区别于evalContext。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">eval</span>(<span class="string">'var x = 10'</span>);</div><div class="line"> </div><div class="line">(<span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">eval</span>(<span class="string">'var y = 20'</span>);</div><div class="line">&#125;)();</div><div class="line"> </div><div class="line">alert(x); <span class="comment">// 10</span></div><div class="line">alert(y); <span class="comment">// not defined</span></div></pre></td></tr></table></figure></p>
+<p>上下文堆栈变化依次为：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">ECStack = [globalContext]</div><div class="line"></div><div class="line"><span class="comment">// eval('var x=10')</span></div><div class="line">ECStack.push(evalContext, <span class="attr">callingContext</span>: globalContext)</div><div class="line">ECStack.pop()</div><div class="line"></div><div class="line"><span class="comment">// foo function call</span></div><div class="line">ECStack.push(<span class="xml"><span class="tag">&lt;<span class="name">foo</span>&gt;</span> functionContext)</span></div><div class="line"><span class="xml"></span></div><div class="line"><span class="xml">// eval('var y=20')</span></div><div class="line">ECStack.push(evalContext, callingContext: &lt;foo&gt; functionContext)</div><div class="line">ECStack.pop()</div><div class="line">ECStack.pop()</div></pre></td></tr></table></figure></p>
+<p>从上下文堆栈可以看出，var x=10会影响calling context 也就是global； 而var y=20会影响function context也就是<code>&lt;foo&gt;</code>； 所以最后在global上下文访问x的值是10，而y是not defined。</p>
+<h4 id="Key-points-for-ECStack"><a href="#Key-points-for-ECStack" class="headerlink" title="Key points for ECStack"></a>Key points for ECStack</h4><ul>
+<li>单线程</li>
+<li>同步执行</li>
+<li>只有一个global context</li>
+<li>当递归调用的时候，可以有无限的function context</li>
+<li>每个函数调用的时候都会创建一个新的execution context（或者说function context）</li>
+</ul>
+<h3 id="Execution-Context-in-Detail"><a href="#Execution-Context-in-Detail" class="headerlink" title="Execution Context in Detail"></a>Execution Context in Detail</h3><p>现在我们知道函数调用会创建一个新的执行上下文，而JS引擎会把这个创建过程分为两个步骤：</p>
+<ol>
+<li>创建阶段</li>
+<li>代码执行阶段</li>
+</ol>
+<p>在创建阶段，当函数被调用且开始执行函数体代码之前：</p>
+<ul>
+<li>创建变量， 函数， 参数</li>
+<li>创建作用域链(ES3的说法) 或者是 词法环境（ES5）</li>
+<li>决定this的指向</li>
+</ul>
+<p>而在代码执行阶段：</p>
+<ul>
+<li>给函数参数赋值，中断或执行代码</li>
+</ul>
+<p>可以把execution context理解成一个object，里面有三个主要的属性：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">executionContextES3 = &#123;</div><div class="line">    <span class="string">'scopeChain'</span>: &#123; <span class="comment">/* variableObject + all parent execution context's variableObject */</span> &#125;,</div><div class="line">    <span class="string">'variableObject'</span>: &#123; <span class="comment">/* function arguments / parameters, inner variable and function declarations */</span> &#125;,</div><div class="line">    <span class="string">'this'</span>: &#123;&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">executionContextES5 = &#123;</div><div class="line">    ThisBinding: <span class="xml"><span class="tag">&lt;<span class="name">this</span> <span class="attr">value</span>&gt;</span>,</span></div><div class="line"><span class="xml">    VariableEnvironment: &#123; ... &#125;,</span></div><div class="line"><span class="xml">    LexicalEnvironment: &#123; ... &#125;,</span></div><div class="line"><span class="xml">&#125;</span></div></pre></td></tr></table></figure></p>
+<h3 id="Variable-Activation-Object-ES3-Variable-Environment-ES5"><a href="#Variable-Activation-Object-ES3-Variable-Environment-ES5" class="headerlink" title="Variable/Activation Object (ES3) || Variable Environment (ES5)"></a>Variable/Activation Object (ES3) || Variable Environment (ES5)</h3><p>TBD</p>
+<h3 id="Scope-Chain-（ES3）-Lexical-Environment-ES5"><a href="#Scope-Chain-（ES3）-Lexical-Environment-ES5" class="headerlink" title="Scope Chain （ES3） || Lexical Environment (ES5)"></a>Scope Chain （ES3） || Lexical Environment (ES5)</h3><h4 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h4><p>环境可以理解成定义在一个作用域中的变量、函数和类的仓库。<br>词法环境则引申为 定义出现在上下文中的<em>标识符</em>与其值之间的关联结构。</p>
+<p>从技术上来讲，环境是由一对 Environment Record (将标识符映射到值的实际存储表) 以及对父的引用（可能为null）组成的。</p>
+<p>用下面代码举例：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">let</span> x = <span class="number">10</span>;</div><div class="line"><span class="keyword">let</span> y = <span class="number">20</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params">z</span>) </span>&#123;</div><div class="line"><span class="keyword">let</span> x = <span class="number">100</span>;</div><div class="line"><span class="keyword">return</span> x + y + z;</div><div class="line">&#125;</div><div class="line">foo(<span class="number">30</span>); <span class="comment">// 150</span></div></pre></td></tr></table></figure></p>
+<p>global context 和 foo <function context=""> 共同组成环境结构：<br><img src="/2018/02/10/Javascript-ExecutionContext/environment-chain.png" alt="environment-chain.png"></function></p>
+<p>这和上一篇文章里面介绍的原型链类似，这里的标识符解析步骤如下： 如果一个变量在自己的环境中找不到，就尝试从父环境和祖先环境中查找，直到查完整个环境链。 注意这里global context的Parent指向就为null， 标志结束。</p>
+<p><strong>Identifier Resolution</strong><br>一个环境链中解析一个变量（binding）的过程。 解析不出来的绑定会抛出<em>ReferenceError</em>。</p>
+<p>这样解释了x解析为100而不是10，因为在foo自己的环境找到了x，这些变量都是存放在activation environment里面。 而y则是通过环境链往上查找，在global context里面找到并予以解析。</p>
+<p>和原型类似，同样的父环境能够被多个子环境共享，e.g. 两个全局函数将共享同样的global environment。<br>而环境记录有很多种:</p>
+<ul>
+<li>object env</li>
+<li>declarative env</li>
+<li>function env</li>
+<li>module env</li>
+</ul>
+<p>虽然每种类型的记录都有自己特定的属性。 但是标识符解析的方法不依赖于特定的record，都使用一套通用的方法来进行解析。如上一小节所述的解析步骤。 </p>
+<p>下面是一个关于global env record的示例：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line">    <span class="comment">// Legacy variables using `var`.</span></div><div class="line"><span class="keyword">var</span> x = <span class="number">10</span>;</div><div class="line"> </div><div class="line"><span class="comment">// Modern variables using `let`.</span></div><div class="line"><span class="keyword">let</span> y = <span class="number">20</span>;</div><div class="line"> </div><div class="line"><span class="comment">// Both are added to the environment record:</span></div><div class="line"><span class="built_in">console</span>.log(</div><div class="line">  x, <span class="comment">// 10</span></div><div class="line">  y, <span class="comment">// 20</span></div><div class="line">);</div><div class="line"> </div><div class="line"><span class="comment">// But only `x` is added to the "binding object".</span></div><div class="line"><span class="comment">// The binding object of the global environment</span></div><div class="line"><span class="comment">// is the global object, and equals to `this`:</span></div><div class="line"> </div><div class="line"><span class="built_in">console</span>.log(</div><div class="line">  <span class="keyword">this</span>.x, <span class="comment">// 10</span></div><div class="line">  <span class="keyword">this</span>.y, <span class="comment">// undefined!</span></div><div class="line">);</div><div class="line"> </div><div class="line"><span class="comment">// Binding object can store a name which is not</span></div><div class="line"><span class="comment">// added to the environment record, since it's</span></div><div class="line"><span class="comment">// not a valid identifier:</span></div><div class="line"> </div><div class="line"><span class="keyword">this</span>[<span class="string">'not valid ID'</span>] = <span class="number">30</span>;</div><div class="line"> </div><div class="line"><span class="built_in">console</span>.log(</div><div class="line">  <span class="keyword">this</span>[<span class="string">'not valid ID'</span>], <span class="comment">// 30</span></div><div class="line">);</div></pre></td></tr></table></figure>
+<p>其对应的binding object及env关系的图片如下：<br><img src="/2018/02/10/Javascript-ExecutionContext/env-binding-object.png" alt="env-binding-object.png"></p>
+<p>这里的binding object是为了cover旧的var声明语句，with语句等，所以使用let语句声明时不会存放在绑定对象中，故this.y为undefined。<br>换句话说，直接访问变量的时候，是访问env record里面的值，而this[properity]访问属性的时候，是访问binding object （此例中同样是global object以及this的指向）。</p>
+<h3 id="Closures"><a href="#Closures" class="headerlink" title="Closures"></a>Closures</h3><p>闭包是一个函数和声明该函数的词法环境的组合。理论上所有函数都是闭包。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span>(<span class="params"></span>) </span>&#123;</div><div class="line"><span class="keyword">let</span> name = <span class="string">"Mozilla"</span>; </div><div class="line"><span class="comment">// name 是一个被init创建的局部变量</span></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">displayName</span>(<span class="params"></span>) </span>&#123; </div><div class="line">        <span class="comment">// displayName() 是一个内部函数,</span></div><div class="line">        <span class="built_in">console</span>.log(<span class="string">`name = <span class="subst">$&#123;name&#125;</span>`</span>); </div><div class="line">        <span class="comment">//  一个闭包使用在父函数中声明的变量</span></div><div class="line">    &#125; </div><div class="line">    displayName();</div><div class="line">&#125;</div><div class="line">init();</div></pre></td></tr></table></figure></p>
+<p>上面的例子说明，嵌套的函数可以访问到其外层作用域中声明的变量。<br>再来看下面这个闭包示例：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a=[];</div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</div><div class="line">    a[i]=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(i);</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line">a[<span class="number">0</span>](); <span class="comment">//10</span></div></pre></td></tr></table></figure></p>
+<p>要理解这个结果，关键在于那个括号<strong>()</strong>，只有带括号的时候才是执行函数，a[i]=function… 这句代码只是把函数引用赋予a[i]这个变量，还未进行执行也就未进行变量值的解析。<br>当for循环结束的时候，global上下文的i值已经变为10了，这时候执行a<a href="">0</a>，开始进行变量解析，发现function本身的作用域没找到定义的i，于是往外部作用域向上查找，在global作用域找到i而且值为10，于是输出10。</p>
+<pre><code>NOTE：注意这里创建的闭包，都是共享同一个作用域链（也称作词法环境）的([[Scope]]属性)。 
+</code></pre><p>接下来看下面这个例子，由于let创建了块级作用域，函数往上查找作用域链的时候会在块级作用域里找到定义的i，这时候i为当时块级作用域设置的值，故返回expect的value。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a=[];</div><div class="line"><span class="keyword">for</span>(<span class="keyword">let</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</div><div class="line">    a[i]=<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(i);</div><div class="line">    &#125;;</div><div class="line">&#125;</div><div class="line">a[<span class="number">0</span>](); <span class="comment">//0</span></div><div class="line"></div><div class="line"><span class="comment">//可以理解为创建了多个块级作用域；</span></div><div class="line"><span class="comment">//&#123;</span></div><div class="line"><span class="comment">//    let i=0;</span></div><div class="line"><span class="comment">//    a[i]=function ()&#123;console.log(i)&#125;</span></div><div class="line"><span class="comment">//&#125;</span></div><div class="line"></div><div class="line"><span class="comment">//&#123;</span></div><div class="line"><span class="comment">//    let i=1;</span></div><div class="line"><span class="comment">//    a[i]=function ()&#123;console.log(i)&#125;</span></div><div class="line"><span class="comment">//&#125;</span></div><div class="line"><span class="comment">//...</span></div><div class="line"></div><div class="line"><span class="comment">//当执行a[0]()的时候，会找到定义时所在的作用域，由于函数里没定义i，于是往上查找，在块级作用域里找到i的值为0于是返回。</span></div></pre></td></tr></table></figure></p>
+<pre><code>NOTE: 上面这种通过捕获函数创建时所在的环境来解析变量值做法，从理论上来说是实现了静态作用域。
+</code></pre><p>在ES6之前没块级作用域，可以用另外一种办法,手动创建一个作用域，只有函数可以创建作用域，所以这里用到了立即执行函数并把当前的i值传进去：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a=[];</div><div class="line"><span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</div><div class="line">    a[i]=(<span class="function"><span class="keyword">function</span>(<span class="params">n</span>)</span>&#123;</div><div class="line"> 	<span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(n);&#125;</div><div class="line">    &#125;)(i);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>上面的例子可以理解为手动创建了多个作用域(或者说创建了多个执行上下文)，因为使用立即执行函数会立即执行，所以值会马上传递进里层函数；虽然立即执行函数销毁了，但是闭包会保存当时定义函数时上下文中的数据，如图中的[[Scope]]属性：<br><img src="/2018/02/10/Javascript-ExecutionContext/Closure2.png" alt="Closure2.png"></p>
+<h3 id="This"><a href="#This" class="headerlink" title="This"></a>This</h3><p>在JS里面，this是execution context中的一个属性，值是进入上下文的时候决定的，在上下文运行期间不能进行修改。</p>
+<h4 id="Global-Context"><a href="#Global-Context" class="headerlink" title="Global Context"></a>Global Context</h4><p>在global上下文中，this指向global object。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//在浏览器中， window对象和global对象等价</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">this</span> === <span class="built_in">window</span>); <span class="comment">// true</span></div><div class="line"></div><div class="line">a = <span class="number">233</span>;</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span>.a); <span class="comment">// 233</span></div><div class="line"></div><div class="line"><span class="keyword">this</span>.b = <span class="string">"MDN"</span>;</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span>.b)  <span class="comment">// "MDN"</span></div></pre></td></tr></table></figure>
+<h4 id="Function-context"><a href="#Function-context" class="headerlink" title="Function context"></a>Function context</h4><p>在函数内，this的指向取决于函数是如何被调用的。</p>
+<h5 id="Simple-call"><a href="#Simple-call" class="headerlink" title="Simple call"></a>Simple call</h5><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//在非严格模式下，函数里的this默认指向window</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f1</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">f1() === <span class="built_in">window</span>; <span class="comment">// true </span></div><div class="line"></div><div class="line"><span class="comment">//在严格模式下，this取进入上下文的值，由于没指定故为undefined</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f2</span>(<span class="params"></span>) </span>&#123;</div><div class="line"><span class="meta">  'use strict'</span>; <span class="comment">// strict mode</span></div><div class="line">  <span class="keyword">return</span> <span class="keyword">this</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">f2() === <span class="literal">undefined</span>; <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<h5 id="apply-call"><a href="#apply-call" class="headerlink" title="apply/call"></a>apply/call</h5><p>apply和call都是在Function.prototype里面定义的，使用apply/call可以把this的值从一个上下文传递到另一个上下文。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Usage</span></div><div class="line"><span class="comment">//func.apply(thisArg, [argsArray])</span></div><div class="line"><span class="comment">//function.call(thisArg, arg1, arg2, ...)</span></div><div class="line"><span class="comment">//用法没什么区别，只是其它传入参数在使用apply时候会是用一个arguments数组在第二参数指定,而call则是接受一个argument列表逐个指定参数。</span></div><div class="line"></div><div class="line"><span class="comment">// 可以把一个对象作为第一个参数传入apply/call，这会使this绑定到该对象</span></div><div class="line"><span class="keyword">var</span> obj = &#123;<span class="attr">a</span>: <span class="string">'Custom'</span>&#125;;</div><div class="line"></div><div class="line"><span class="comment">// This property is set on the global object</span></div><div class="line"><span class="keyword">var</span> a = <span class="string">'Global'</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">whatsThis</span>(<span class="params">arg</span>) </span>&#123;</div><div class="line"><span class="keyword">return</span> <span class="keyword">this</span>.a;  <span class="comment">// The value of this is dependent on how the function is called</span></div><div class="line">&#125;</div><div class="line"></div><div class="line">whatsThis();          <span class="comment">// 'Global'</span></div><div class="line">whatsThis.call(obj);  <span class="comment">// 'Custom'</span></div><div class="line">whatsThis.apply(obj); <span class="comment">// 'Custom'</span></div></pre></td></tr></table></figure></p>
+<h5 id="bind"><a href="#bind" class="headerlink" title="bind"></a>bind</h5><p>bind定义在Function.prototpye下, 同样用来改变this的指向。 当使用fun.bind(someObj)的时候，将创建一个新方法（<strong>bound function</strong>），这个函数会有相同的函数体和作用域， 但是this将会永久绑定到bind的第一个参数。 和call/apply的立即执行不同，这里只是添加了一个永久绑定，没有执行。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Usage:</span></div><div class="line"><span class="comment">//fun.bind(thisArg[, arg1[, arg2[, ...]]])</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">f</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.a;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> g = f.bind(&#123;<span class="attr">a</span>: <span class="string">'azerty'</span>&#125;);</div><div class="line"><span class="built_in">console</span>.log(g()); <span class="comment">// azerty</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> h = g.bind(&#123;<span class="attr">a</span>: <span class="string">'yoo'</span>&#125;); <span class="comment">// bind only works once!</span></div><div class="line"><span class="built_in">console</span>.log(h()); <span class="comment">// azerty</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> o = &#123;<span class="attr">a</span>: <span class="number">37</span>, <span class="attr">f</span>: f, <span class="attr">g</span>: g, <span class="attr">h</span>: h&#125;;</div><div class="line"><span class="built_in">console</span>.log(o.f(), o.g(), o.h()); <span class="comment">// 37, azerty, azerty</span></div></pre></td></tr></table></figure>
+<p>通常使用window.setTimeout的时候，默认this会指向window，其中一种方法改变this的指向便是使用bind：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="string">'window'</span>;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Foo</span>(<span class="params"></span>)</span>&#123;</div><div class="line"> <span class="keyword">this</span>.a = <span class="string">'inner'</span>;</div><div class="line"> <span class="keyword">this</span>.getA = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.a)&#125;, <span class="number">1000</span>)&#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> f = <span class="keyword">new</span> Foo()</div><div class="line">f.getA() <span class="comment">//window</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Bar</span>(<span class="params"></span>)</span>&#123;</div><div class="line"> <span class="keyword">this</span>.a = <span class="string">'inner'</span>;</div><div class="line">    <span class="keyword">this</span>.getA = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.a)&#125;.bind(<span class="keyword">this</span>), <span class="number">1000</span>)&#125;;</div><div class="line">&#125;    </div><div class="line"></div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> Bar()</div><div class="line">b.getA() <span class="comment">//inner</span></div></pre></td></tr></table></figure></p>
+<h5 id="Arrow-function"><a href="#Arrow-function" class="headerlink" title="Arrow function"></a>Arrow function</h5><p>箭头函数，和其它普通函数相比它没有独立的this而是使用当前词法上下文中的this, 换句话说就是定义时所在对象的this，而非执行时所在的对象的this。用上面使用的setTimeout例子，箭头函数可以保持this指向构造函数创建的对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//Arrow function to keep this retain</span></div><div class="line"><span class="keyword">var</span> a = <span class="string">'window'</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Baz</span>(<span class="params"></span>)</span>&#123;</div><div class="line"> <span class="keyword">this</span>.a = <span class="string">'inner'</span>;</div><div class="line">    <span class="keyword">this</span>.getA = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;setTimeout(<span class="function"><span class="params">()</span>=&gt;</span>&#123;<span class="built_in">console</span>.log(<span class="keyword">this</span>.a)&#125;, <span class="number">1000</span>)&#125;;</div><div class="line">&#125;    </div><div class="line"></div><div class="line"><span class="keyword">var</span> z = <span class="keyword">new</span> Baz()</div><div class="line">z.getA() <span class="comment">//inner</span></div><div class="line"></div><div class="line"></div><div class="line"><span class="comment">//Another method in ECMAScript 3/5 to fix by assign value of this to a variable， 应该是使用了闭包</span></div><div class="line"><span class="keyword">var</span> a = <span class="string">'window'</span>;</div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Bla</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="keyword">var</span> that = <span class="keyword">this</span>;</div><div class="line"> <span class="keyword">this</span>.a = <span class="string">'inner'</span>;</div><div class="line">    <span class="keyword">this</span>.getA = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;setTimeout(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;<span class="built_in">console</span>.log(that.a)&#125;, <span class="number">1000</span>)&#125;;</div><div class="line">&#125;    </div><div class="line"></div><div class="line"><span class="keyword">var</span> l = <span class="keyword">new</span> Bla()</div><div class="line">l.getA() <span class="comment">//inner</span></div></pre></td></tr></table></figure>
+<p>其中后面临时把this赋值给变量that的做法，使用的正是闭包：<br><img src="/2018/02/10/Javascript-ExecutionContext/Closure.png" alt="Closure.png"></p>
+<h5 id="As-an-object-method"><a href="#As-an-object-method" class="headerlink" title="As an object method"></a>As an object method</h5><p>当函数作为对象的一个方法被调用的时候，this指向被调用函数所在的对象。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = &#123;</div><div class="line">    prop: <span class="number">233</span>,</div><div class="line">    f: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.prop;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(o.f()); <span class="comment">// 233</span></div></pre></td></tr></table></figure>
+<h5 id="As-a-constructor"><a href="#As-a-constructor" class="headerlink" title="As a constructor"></a>As a constructor</h5><p>当函数被用作构造函数（使用new关键字），this指向这个新构造出来的对象。值得注意的是，假如构造函数返回一个对象，那么new的时候this自动绑定的新对象就会失效，this指向返回的对象，如下面例子中的C2.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">C</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.a = <span class="number">233</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> o = <span class="keyword">new</span> C();</div><div class="line"><span class="built_in">console</span>.log(o.a); <span class="comment">//233</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">C2</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.a = <span class="number">233</span>; <span class="comment">//dead code</span></div><div class="line">    <span class="keyword">return</span> &#123;<span class="attr">a</span>: <span class="number">666</span>&#125;;</div><div class="line">&#125;</div><div class="line"></div><div class="line">o = <span class="keyword">new</span> C2();</div><div class="line"><span class="built_in">console</span>.log(o.a); <span class="comment">//666</span></div></pre></td></tr></table></figure>
+<h3 id="Hoisting"><a href="#Hoisting" class="headerlink" title="Hoisting"></a>Hoisting</h3><p>通常译作变量提升，意思是在变量作用域内，不管变量在哪个位置声明，都会提升到作用域顶部。下面是一个具体例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="comment">//hoisting</span></div><div class="line"><span class="built_in">console</span>.log(a); <span class="comment">//output undefined 而不是error 'variable a is not defined'</span></div><div class="line"><span class="keyword">var</span> a =<span class="number">1</span>;</div><div class="line"></div><div class="line"><span class="comment">//变量提升后等价于下面语句</span></div><div class="line"><span class="keyword">var</span> a;</div><div class="line"><span class="built_in">console</span>.log(a);</div><div class="line">a = <span class="number">1</span>;</div></pre></td></tr></table></figure></p>
+<p>我理解这个其实和作用域有关，在代码执行之前会有一个创建阶段, 变量已经在AO里面定义了，所以执行时可以找到。<br>需要注意的是，在创建阶段，函数声明会比变量声明先创建，如下面这个例子，因为foo的函数引用先创建，再次声明变量foo的时候发现遇到同名的情况，JS引擎会bypass忽略掉新的变量声明。 而与此相对，当function第二次声明的时候，会覆盖原来的声明，故下面例子输出的是’hi’而不是’hello’。<br>而对于bar，因为这个bar是赋值函数表达式，和函数声明的区别是不会变量提升(hoisting)，所以结果是找不到bar的定义。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123; <span class="comment">//立即执行函数</span></div><div class="line"></div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">typeof</span> foo); <span class="comment">// function pointer</span></div><div class="line">	<span class="built_in">console</span>.log(foo()) <span class="comment">//hi</span></div><div class="line">	<span class="built_in">console</span>.log(<span class="keyword">typeof</span> bar); <span class="comment">//undefined</span></div><div class="line">    <span class="built_in">console</span>.log(bar()) <span class="comment">// Uncaught TypeError: bar is not a function</span></div><div class="line">    <span class="keyword">var</span> foo = <span class="string">'hello'</span>,</div><div class="line">        bar = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">            <span class="keyword">return</span> <span class="string">'world'</span>;</div><div class="line">        &#125;;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">'hello'</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">'hi'</span></div><div class="line">    &#125;</div><div class="line">&#125;());</div></pre></td></tr></table></figure>
+<p>需要注意的是，let声明的变量不存在变量提升，只能先声明后使用。 let和var的区别在于let是ECMAScript2015规范下的新关键字，可以创建块级作用域。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Javascript-Execution-Context&quot;&gt;&lt;a href=&quot;#Javascript-Execution-Context&quot; class=&quot;headerlink&quot; title=&quot;Javascript Execution Context&quot;&gt;&lt;/a&gt;Ja
+    
+    </summary>
+    
+    
+      <category term="Javascript" scheme="https://bournexian.github.io/tags/Javascript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Javascript_prototype</title>
+    <link href="https://bournexian.github.io/2018/01/23/Javascript-prototype/"/>
+    <id>https://bournexian.github.io/2018/01/23/Javascript-prototype/</id>
+    <published>2018-01-23T14:25:53.000Z</published>
+    <updated>2018-01-26T14:27:22.999Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Javascript-Prototype"><a href="#Javascript-Prototype" class="headerlink" title="Javascript Prototype"></a>Javascript Prototype</h3><p>捣鼓过Docker之后，接着开个坑，打算跟着cnblog上面一些文章和MDN的参考资料学习下JS或者说前端方面，这里是第一篇：JS原型。</p>
+<h3 id="References"><a href="#References" class="headerlink" title="References:"></a>References:</h3><p><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain" target="_blank" rel="external">https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain</a></p>
+<p><a href="http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html" target="_blank" rel="external">http://www.cnblogs.com/TomXu/archive/2011/12/15/2288411.html</a></p>
+<p><a href="http://www.xiaojichao.com/post/jscorev2.html" target="_blank" rel="external">http://www.xiaojichao.com/post/jscorev2.html</a></p>
+<h4 id="Inheritance"><a href="#Inheritance" class="headerlink" title="Inheritance"></a>Inheritance</h4><p>为什么需要继承？<br>举个例子有猫和狗两种动物，可以定义两个类Cat和Dog分别代表这两种动物，而每个动物都有体重，高度，毛色等特征，那么是否需要在各个类里面定义这些属性呢？<br>这时候就可以通过把共有的属性集成到基类Animal里面，其它动物只需要继承Animal就可以了，减少了重复代码增加了可维护性。</p>
+<p>在Javascript中是如何实现继承的呢？ 答案是通过prototype（原型）。</p>
+<h4 id="Prototype-Chain-amp-Inheriting-properties"><a href="#Prototype-Chain-amp-Inheriting-properties" class="headerlink" title="Prototype Chain &amp; Inheriting properties"></a>Prototype Chain &amp; Inheriting properties</h4><p>和Java或者C#等语言基于类继承不同，Javascript是基于prototype（原型）来实现继承的。<br>每个对象都拥有一个私有属性来保存一个连接到另一个对象，这里面的“另一个对象”就是当前对象的原型。  而那个原型对象本身也是对象，也有它自己的原型，所以就会形成一个原型链，知道最后原型是null结束。</p>
+<p>在ECMAScript里面，保存连接的私有对象是 [[Prototype]], 但是由于它是私有的不能直接访问。其中一个非标准实现是通过大多浏览器实现的__proto__属性来访问， 或者在ES2015以后版本可以通过Object.getPrototypeOf() 和 Object.setPrototypeOf() 来获取或者设置原型。</p>
+<p><img src="/2018/01/23/Javascript-prototype/JS__proto__.png" alt="JS__proto__.png"></p>
+<p>上面例子是创建一个Object o，并赋予两个属性a和b。 通过__proto__获取原型对象，可见通过括号这种方式新建对象的原型是Object.prototype。</p>
+<p><img src="/2018/01/23/Javascript-prototype/prototype_chain.png" alt="prototype_chain.png"></p>
+<p>而上面例子是在第一个例子的基础上，定义一个Object j，赋予属性b和c， 并把o的原型指向j。 当o.c执行时，在当前对象属性找不到c，会到对象的原型上去找，发现o的原型j上有定义c并且值为4，故返回4。 当执行o.b时，由于当前对象已经定义了b的值，故直接返回2而不会继续搜索原型链。 同时j自己也有原型是Object.prototype, 而Object.prototype自己的原型则是null，原型链至此结束。 整条原型链搜索过程可以用符号表示为：<br>    o —&gt; j —&gt; Object.prototype —&gt; null</p>
+<p>假如访问一个属性(举个例子使用代码o.d访问属性名d)，在原型链搜索完后仍未找到，则会返回undefined。</p>
+<blockquote>
+<p>NOTE: 假如不想访问原型链上面的属性，只访问定义在当前对象的属性，可以使用hasOwnProperty方法或getOwnPropertyNames方法。 hasOwnProperty方法定义在Object.prototype上而默认对象原型会从那里继承，故一般可以直接使用. 下面是一个使用hasOwnProperty的遍历当前对象可枚举属性的例子 以及 使用getOwnPropertyNames的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">var</span> property <span class="keyword">in</span> obj) <span class="comment">//for...in loop only iterate the enumerable items</span></div><div class="line">&#123;</div><div class="line">    <span class="keyword">if</span> (obj.hasOwnProperty(property))</div><div class="line">    &#123;</div><div class="line">        <span class="comment">//properities defined under obj directly</span></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//sample 2 get own peroperties by 'getOwnPropertyNames' function</span></div><div class="line"><span class="built_in">Object</span>.getOwnPropertyNames(obj)</div><div class="line"><span class="comment">//The Object.getOwnPropertyNames() method returns an array of all properties (including non-enumerable properties except for those which use Symbol) found directly upon a given object.</span></div></pre></td></tr></table></figure></p>
+</blockquote>
+<h4 id="Inheriting-“methods”"><a href="#Inheriting-“methods”" class="headerlink" title="Inheriting “methods”"></a>Inheriting “methods”</h4><p>和继承属性类似，方法也可以被继承。在Javascript中，方法可以作为属性添加到对象中。<br>下面引用MDN的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = &#123;</div><div class="line">   a: <span class="number">2</span>,</div><div class="line">   m: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.a + <span class="number">1</span>;</div><div class="line">    &#125; </div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(o.m()); <span class="comment">// 3</span></div><div class="line"><span class="comment">// When calling o.m in this case, 'this' refers to o</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> p = <span class="built_in">Object</span>.create(o);</div><div class="line"><span class="comment">// p is an object that inherits from o</span></div><div class="line"></div><div class="line">p.a = <span class="number">4</span>; <span class="comment">// creates a property 'a' on p</span></div><div class="line"><span class="built_in">console</span>.log(p.m()); <span class="comment">// 5</span></div></pre></td></tr></table></figure></p>
+<p>这个例子是举例p是从o继承的，所以也能访问o定义的方法。 至于Object.create()方法是除了__proto__属性外设置对象原型的方法， 它会返回一个新对象，并且新对象是以传入的第一个参数作为原型的，在本例中p是以o作为原型。  而this是会指向构造函数创建的新对象，在这个例子中就是指代p，所以p.m()结果是5。 这个this会在后面的进行更深入的了解。</p>
+<blockquote>
+<p>NOTE: 通常不显式指定原型的话，都会以Object.prototype作为默认原型，而想要一个新对象不从任何对象继承的话，可以使用 <code>Object.create(null)</code>.</p>
+</blockquote>
+<h3 id="Different-prototype-chain-when-create-object-in-different-ways"><a href="#Different-prototype-chain-when-create-object-in-different-ways" class="headerlink" title="Different prototype chain when create object in different ways"></a>Different prototype chain when create object in different ways</h3><h4 id="Object-created-with-different-syntax"><a href="#Object-created-with-different-syntax" class="headerlink" title="Object created with different syntax"></a>Object created with different syntax</h4><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> o = &#123;<span class="attr">a</span>: <span class="number">1</span>&#125;;</div><div class="line"><span class="comment">//o ---&gt; Object.prototype ---&gt; null</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> b = [<span class="string">'a'</span>, <span class="string">'b'</span>]</div><div class="line"><span class="comment">// b ---&gt; Array.prototype ---&gt; Object.prototype ---&gt; null</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">c</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">&#125;</div><div class="line"><span class="comment">// c ---&gt; Function.prototype ---&gt; Object.prototype ---&gt; null</span></div></pre></td></tr></table></figure>
+<p>简而言之就是使用不同的语法来创建对象，会有不同的效果，原型链也不一样。</p>
+<h4 id="Create-Object-with-a-constructor"><a href="#Create-Object-with-a-constructor" class="headerlink" title="Create Object with a constructor"></a>Create Object with a constructor</h4><p>在JS语言里面，”函数是第一等公民”, 函数本身也是一个对象，而构造函数就是普通的JS函数，只不过加上new操作符。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Graph</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.vertices = [];</div><div class="line">    <span class="keyword">this</span>.edges = [];</div><div class="line">&#125;</div><div class="line"></div><div class="line">Graph.prototype = &#123;</div><div class="line">    addVertex: <span class="function"><span class="keyword">function</span>(<span class="params">v</span>) </span>&#123;</div><div class="line">        <span class="keyword">this</span>.vertices.push(v);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> g = <span class="keyword">new</span> Graph();</div><div class="line"><span class="comment">// g ---&gt; Graph.prototype ---&gt; Object.prototype ---&gt; null</span></div><div class="line"><span class="comment">// Graph ---&gt; Function.prototype ---&gt; Object.prototype ---&gt; null</span></div></pre></td></tr></table></figure>
+<p>上面例子中，g是new出来的，也就是Graph的一个实例。 值得注意的是Graph函数本身也是对象，所以它本身也会有原型。</p>
+<blockquote>
+<p>NOTE: 实际上new运算符会： </p>
+<ol>
+<li>创建新的空对象 </li>
+<li>把this绑定到新对象 </li>
+<li>给新创建的对象添加__proto__属性，指向构造函数的原型对象 </li>
+<li>给函数末尾添加一条return this语句，使被创建的对象从函数返回。</li>
+</ol>
+</blockquote>
+<h4 id="With-Object-create"><a href="#With-Object-create" class="headerlink" title="With Object.create"></a>With Object.create</h4><p>这Object.create可以指定新对象的原型， 和上面Inheriting “methods”例子类似，就不赘述。</p>
+<h4 id="With-class-keyword"><a href="#With-class-keyword" class="headerlink" title="With class keyword"></a>With class keyword</h4><p>ES2015支持了新的关键字，class，constructor，static，extends，super。这些关键字可以理解为语法糖，背后继承的实现仍然是基于原型链的。 下面是MDN给出的例子，有空再学习下ECS2015的新语法。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="meta">'use strict'</span>;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Polygon</span> </span>&#123;</div><div class="line"><span class="keyword">constructor</span>(height, width) &#123;</div><div class="line">    <span class="keyword">this</span>.height = height;</div><div class="line">    <span class="keyword">this</span>.width = width;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Square</span> <span class="keyword">extends</span> <span class="title">Polygon</span> </span>&#123;</div><div class="line"><span class="keyword">constructor</span>(sideLength) &#123;</div><div class="line">    <span class="keyword">super</span>(sideLength, sideLength);</div><div class="line">&#125;</div><div class="line">get area() &#123;</div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.height * <span class="keyword">this</span>.width;</div><div class="line">&#125;</div><div class="line">set sideLength(newLength) &#123;</div><div class="line">    <span class="keyword">this</span>.height = newLength;</div><div class="line">    <span class="keyword">this</span>.width = newLength;</div><div class="line">&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> square = <span class="keyword">new</span> Square(<span class="number">2</span>);</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;Javascript-Prototype&quot;&gt;&lt;a href=&quot;#Javascript-Prototype&quot; class=&quot;headerlink&quot; title=&quot;Javascript Prototype&quot;&gt;&lt;/a&gt;Javascript Prototype&lt;/h3&gt;&lt;
+    
+    </summary>
+    
+    
+      <category term="Javascript" scheme="https://bournexian.github.io/tags/Javascript/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker-Swarm</title>
+    <link href="https://bournexian.github.io/2017/12/28/Docker-Swarm/"/>
+    <id>https://bournexian.github.io/2017/12/28/Docker-Swarm/</id>
+    <published>2017-12-28T14:37:31.000Z</published>
+    <updated>2018-01-02T15:23:47.679Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Docker-–-Swarm"><a href="#Docker-–-Swarm" class="headerlink" title="Docker – Swarm"></a>Docker – Swarm</h3><h4 id="Introduction-to-Docker-Machine"><a href="#Introduction-to-Docker-Machine" class="headerlink" title="Introduction to Docker Machine"></a>Introduction to Docker Machine</h4><h5 id="Docker-Engine"><a href="#Docker-Engine" class="headerlink" title="Docker Engine"></a>Docker Engine</h5><p>在使用Swarm之前，个人认为有必要先介绍下Docker Machine的概念。<br>我们口中所说的docker，指的是docker engine， 包含三个部分：</p>
+<ul>
+<li>docker daemon</li>
+<li>REST API</li>
+<li>docker CLI</li>
+</ul>
+<p><img src="/2017/12/28/Docker-Swarm/engine.png" alt="engine.png"></p>
+<p>安装docker engine的主机就是host，我们通常使用docker CLI的命令透过REST API和本机的docker daemon打交道。</p>
+<h5 id="Docker-Machine"><a href="#Docker-Machine" class="headerlink" title="Docker Machine"></a>Docker Machine</h5><p>与在host机器安装docker engine相比，docker machine则是通过REST API与远程机器的docker daemon通讯，使用的是docker machine CLI。 通过docker machine create命令可以在本地网络创建docker host (e.g.在本机的VirtualBox新建一个linux虚拟机，然后在此虚拟机里安装docker engine)， 也可以在云服务如Azure，AWS上面创建docker host。<br>docker machine create通常会生成证书用于认证，以及配置远程机器监听的TCP端口，然后就可以在本机管理远程的机器上面运行的docker daemon。如下图所示：</p>
+<p><img src="/2017/12/28/Docker-Swarm/machine.png" alt="machine.png"></p>
+<h4 id="Swarm"><a href="#Swarm" class="headerlink" title="Swarm"></a>Swarm</h4><p>Swarm可以理解成一个集群， 使用docker swarm init可以启用swarm模式。 而集群里面分为manager和worker两种角色，每台实体机或者虚拟机可以视为一个node。</p>
+<p>下面以Windows下为例子，使用hyperv作为docker machine的driver创建两个docker host:<br>首先到Virtual Switch Manager创建一个virtual switch，命名为myswitch， 然后执行命令：</p>
+<pre><code>docker-machine create -d hyperv --hyperv-virtual-switch &quot;myswitch&quot; myvm1
+</code></pre><p>这个命令会使用boot2docker.iso镜像来生成一个VM，并在VM里面安装docker engine，配置相关连接的证书和监听端口。 其中输出如下图:</p>
+<p><img src="/2017/12/28/Docker-Swarm/docker_machine_create.png" alt="docker_machine_create.png"></p>
+<p>继续使用相同命令创建另外一个VM并命名为myvm2:</p>
+<pre><code>docker-machine create -d hyperv --hyperv-virtual-switch &quot;myswitch&quot; myvm2
+</code></pre><p>查看刚才创建的machines：</p>
+<pre><code>docker-machine ls
+</code></pre><p>使用ssh协议连接到myvm1，在该VM上初始化SWARM，默认为manager角色:</p>
+<pre><code>docker-machine ssh myvm1 &quot;docker swarm init&quot;
+</code></pre><p>使用ssh协议连接到myvm2，在该VM上执行join命令，作为worker角色添加到swarm:</p>
+<pre><code>docker-machine ssh myvm2 &quot;docker swarm join --token &lt;token&gt; &lt;ip&gt;:2377&quot;
+</code></pre><p>添加完后可以使用docker node 在manager角色的机器上面打印出现有的节点状态：</p>
+<pre><code>docker-machine ssh myvm1 &quot;docker node ls&quot;
+</code></pre><p><img src="/2017/12/28/Docker-Swarm/docker_node_ls.png" alt="docker_node_ls.png"></p>
+<p>如上图显示，有3个节点，第一个节点是在host机器安装的docker engine，因为未加入swarm集群，所以status是Down，但是因为docker daemon仍然在运行，所以availability是Active。 而Manager节点ID后面会有个星号，并Manager Status显示为Leader，worker节点则没有。  </p>
+<p>顾名思义，Manager Node主要负责管理调度的工作，Worker主要职责是执行Manager分配的任务，但需要注意的是，Manager Node不单单负责管理职能，它同时作为一个Worker，会有容器运行在其上面。</p>
+<p>另外，除了上面使用的docker-machine ssh “<command to="" be="" invoked="" in="" the="" vm="">“这种格式外，还能使用交互shell方式连接，这样session会保留直到关闭命令行窗口，如要连接myvm1则执行:</p>
+<pre><code>docker-machine env myvm1
+</code></pre><p>然后按照提示执行：</p>
+<pre><code>docker-machine env myvm1 | Invoke-Expression
+</code></pre><p>这样再执行docker命令就是在直接对myvm1的docker engine上面执行命令。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;Docker-–-Swarm&quot;&gt;&lt;a href=&quot;#Docker-–-Swarm&quot; class=&quot;headerlink&quot; title=&quot;Docker – Swarm&quot;&gt;&lt;/a&gt;Docker – Swarm&lt;/h3&gt;&lt;h4 id=&quot;Introduction-to-D
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="https://bournexian.github.io/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker Services</title>
+    <link href="https://bournexian.github.io/2017/12/23/Docker-Services/"/>
+    <id>https://bournexian.github.io/2017/12/23/Docker-Services/</id>
+    <published>2017-12-23T14:37:03.000Z</published>
+    <updated>2018-01-02T15:26:03.449Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Docker-–-Services"><a href="#Docker-–-Services" class="headerlink" title="Docker – Services"></a>Docker – Services</h3><h4 id="About-services"><a href="#About-services" class="headerlink" title="About services"></a>About services</h4><p>通常一个应用都由不同部分组成，比如一个网站会有Web服务器提供Web服务，数据库提供存储服务，还有其它一些组件组成。 Service可以看作定义了单个组件（或者说服务）是如何运行image的，e.g.定义 开放了哪些端口，有多少个副本（或者说实例）等。 而这些配置的定义，是通过docker-compose.yml文件实现的。</p>
+<p>仔细想来，之前提过的Dockerfile不就是定义了如何运行image的，这里回顾一下Dockerfile的作用是： 方便复用。 只需要记录下baseimage和配置的过程，把这个文件share出去，别人运行的时候也能复现该结果。减免把image以及修改进行打包分享的麻烦（因为这样size会比较大）。</p>
+<p>那么Dockerfile与docker-compose有什么联系和区别？ 它们很相似，只不过Dockerfile是记录单个服务的构建过程，而docker-compose则记录一组服务的构建，以及如何把这些服务连接起来的信息。</p>
+<h4 id="Docker-compose-yml"><a href="#Docker-compose-yml" class="headerlink" title="Docker-compose.yml"></a>Docker-compose.yml</h4><p>docker-compose文件的官网例子：</p>
+<pre><code>version: &quot;3&quot;
+services:
+  web:
+    # replace username/repo:tag with your name and image details
+    image: bourne/get-started:part2
+    deploy:
+      replicas: 5
+      resources:
+          limits:
+            cpus: &quot;0.1&quot;
+            memory: 50M
+      restart_policy:
+          condition: on-failure
+    ports:
+        - &quot;80:80&quot;
+    networks:
+        - webnet
+networks:
+  webnet:
+</code></pre><p>其中services就是定义了各服务，其中可以看见有一个web结点定义了web服务的构建以及一个networks节点定义了network服务。  Web service节点下面又指定了：</p>
+<ul>
+<li>使用的image</li>
+<li>deploy的实例数目是5即启动5个container，并且每个container限制使用10%的CPU和50M的内存</li>
+<li>有container fails就执行重启</li>
+<li>配置mapping的端口</li>
+<li>配置使用的网络</li>
+</ul>
+<h4 id="Run-the-docker-compose-yml-to-build-the-app"><a href="#Run-the-docker-compose-yml-to-build-the-app" class="headerlink" title="Run the docker-compose.yml to build the app"></a>Run the docker-compose.yml to build the app</h4><p>要执行docker-compose文件之前，需要开启swarm， 否则会报错。 执行以下命令初始化swarm:</p>
+<pre><code>docker swarm init
+</code></pre><blockquote>
+<p>假如该主机有多个IP，则需要用 –advertise-addr [IP addr] 来指定具体的IP初始化swarm。</p>
+</blockquote>
+<p>接着就可以使用stack命令来运行创建的docker-compose文件：</p>
+<pre><code>docker stack deploy -c docker-compose.yml getstartedlab
+</code></pre><p>接着就可以通过命令查看服务：</p>
+<ul>
+<li>查看服务<br>  docker service ls</li>
+<li>查看某个服务的状态<br>  docker service ps getstartedlab_web</li>
+<li>更新docker-compose.yml文件后，再次执行docker stack deploy部署命令则会自动update （in-place update）</li>
+</ul>
+<p><img src="/2017/12/23/Docker-Services/services.png" alt="services.png"></p>
+<p>通过curl访问可以看到每次都print出来不同的container id，可见实现了负载均衡。</p>
+<p><img src="/2017/12/23/Docker-Services/curl_lb.png" alt="curl_lb.png"></p>
+<h4 id="Take-down-the-services-app"><a href="#Take-down-the-services-app" class="headerlink" title="Take down the services/app"></a>Take down the services/app</h4><p>使用docker stack rm 来铲掉之前创建的services：</p>
+<pre><code>docker stack rm getstartedlab
+</code></pre><p>退出swarm模式：</p>
+<pre><code>docker swarm leave --force
+</code></pre><h4 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h4><p>这篇主要围绕docker-compose.yml展开，也涉及了swarm初步的使用，下节将会试下使用swarm创建集群。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;Docker-–-Services&quot;&gt;&lt;a href=&quot;#Docker-–-Services&quot; class=&quot;headerlink&quot; title=&quot;Docker – Services&quot;&gt;&lt;/a&gt;Docker – Services&lt;/h3&gt;&lt;h4 id=&quot;About
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="https://bournexian.github.io/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker-Basic-Command-04</title>
+    <link href="https://bournexian.github.io/2017/12/22/Docker-Basic-Command-04/"/>
+    <id>https://bournexian.github.io/2017/12/22/Docker-Basic-Command-04/</id>
+    <published>2017-12-22T07:48:13.000Z</published>
+    <updated>2017-12-23T14:34:21.097Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="DOCKER-BASIC-COMMAND-–-Bind-Mount-amp-Tmpfs"><a href="#DOCKER-BASIC-COMMAND-–-Bind-Mount-amp-Tmpfs" class="headerlink" title="DOCKER BASIC COMMAND – Bind Mount &amp; Tmpfs"></a>DOCKER BASIC COMMAND – Bind Mount &amp; Tmpfs</h3><p>除了常用的volume外，还有bind mounts以及tmpfs两种方式存储数据； 在concepts那篇文章简单介绍过，bind mount类似于link，把host主机的目录挂载到container内， 而tmpfs则存储在内存中，用于存放临时数据。 下面直接试试用法。</p>
+<h4 id="Bind-mount"><a href="#Bind-mount" class="headerlink" title="Bind mount"></a>Bind mount</h4><p>在docker 17.06后，对于挂载volume或者bind mount，推荐使用–mount参数，而以前的-v参数暂时仍保留。<br>Bind mount不像volume可以单独创建，必须和容器关联使用，而且依赖于host机器的文件系统有特定的目录结构，和volume类似。<br>官网说几个地方跟我实际操作有一点差异，</p>
+<blockquote>
+<p>  When you use a bind mount, a file or directory on the host machine is mounted into a container. The file or directory is referenced by its full or relative path on the host machine. By contrast, when you use a volume, a new directory is created within Docker’s storage directory on the host machine, and Docker manages that directory’s contents.</p>
+</blockquote>
+<p>这里说文件或目录是通过host machine的full/relative path关联，但是注意的是实际使用命令的时候要指定full path, 否则报这个错: invalid mount path: ‘./target’ mount path must be absolute.</p>
+<blockquote>
+<p>  The file or directory does not need to exist on the Docker host already. It is created on demand if it does not yet exist. </p>
+</blockquote>
+<p>第二个，这里说文件或目录不需要已经存在，如果不存在的话会即时创建。 但实际上操作会遇到错误： bind source path does not exist.  不清楚我哪里的操作有问题，或者跟使用的docker版本有关。</p>
+<p>下面例子是运行一个container，并为host主机当前目录下面的target目录创建bind mount，mapping到容器里的/app目录：</p>
+<pre><code>$ docker run -d \
+-it \
+--name devtest \
+--mount type=bind,source=&quot;$(pwd)&quot;/target,target=/app \
+busybox:latest
+</code></pre><p>这里解释下$(pwd)的意思是执行pwd命令，就是获取当前working directory的路径。<br>使用docker inspect devtest，可以查看到Mounts section判别Type为“bind”即为bind mount。</p>
+<pre><code>&quot;Mounts&quot;: [
+        {
+            &quot;Type&quot;: &quot;bind&quot;,
+            &quot;Source&quot;: &quot;/root/target&quot;,
+            &quot;Destination&quot;: &quot;/app&quot;,
+            &quot;Mode&quot;: &quot;&quot;,
+            &quot;RW&quot;: true,
+            &quot;Propagation&quot;: &quot;rprivate&quot;
+        }
+    ],
+</code></pre><p>值得注意的是，假如container里挂载的目录已经有数据，那么将会把目标目录清空，举个极端的例子，假如把/root/target目录挂载到容器的/usr目录，/usr目录的内容会被清空：</p>
+<p><img src="/2017/12/22/Docker-Basic-Command-04/bind_mount_target_diralreadyexists.png" alt="bind_mount_target_diralreadyexists"></p>
+<p>另外可以配置bind mount的挂载选项，比如只读，加上flag readonly即可；<br>同时细心的会发现bind mount跟volume相比，少了“Driver”而多出一个”Propagation”。 Driver是volume独有的，可能是因为bind mount是依赖于宿主机的文件系统，无法定义storage driver。 而propagation这个是跟mount相关的，比如目标机器挂载了 /mnt, 同时这个目录也挂载到了 /tmp. Propagation 设置会决定是否会在挂载/tmp/a的同时允许/mnt/a同时也自动挂载上。 这个propagation算是比较进阶的技能，详细的可以查看文档。</p>
+<h4 id="Tmpfs"><a href="#Tmpfs" class="headerlink" title="Tmpfs"></a>Tmpfs</h4><p>当要保存一些一次性数据的时候，可以使用tmpfs，但要注意的是tmpfs有一些局限性：</p>
+<ul>
+<li>tmpfs mounts cannot be shared among containers.</li>
+<li>tmpfs mounts only work on Linux containers, and not on Windows containers.</li>
+</ul>
+<p>而具体例子如下，因为使用宿主机的内存(或swap)，运行container的时候只需要指定容器内的挂载目录即可：</p>
+<pre><code>docker run -d \
+-it \
+--name tmptest \
+--mount type=tmpfs,destination=/app \
+busybox
+</code></pre><p>还有一些options可以指定：</p>
+<ul>
+<li><p>tmpfs-size<br>Size of the tmpfs mount in bytes. Unlimited by default.</p>
+</li>
+<li><p>tmpfs-mode<br>File mode of the tmpfs in octal. For instance, 700 or 0770. Defaults to 1777 or world-writable.</p>
+</li>
+</ul>
+<h4 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h4><p>至此Docker storage方面的三个重要功能都过了一遍， 接下来会试试Docker services, swarm, stack等进阶命令。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;DOCKER-BASIC-COMMAND-–-Bind-Mount-amp-Tmpfs&quot;&gt;&lt;a href=&quot;#DOCKER-BASIC-COMMAND-–-Bind-Mount-amp-Tmpfs&quot; class=&quot;headerlink&quot; title=&quot;DOCKER
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="https://bournexian.github.io/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker-Basic-Command-03</title>
+    <link href="https://bournexian.github.io/2017/12/18/Docker-Basic-Command-03/"/>
+    <id>https://bournexian.github.io/2017/12/18/Docker-Basic-Command-03/</id>
+    <published>2017-12-18T14:46:32.000Z</published>
+    <updated>2017-12-23T14:34:01.848Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="DOCKER-BASIC-COMMAND-–-Volumes"><a href="#DOCKER-BASIC-COMMAND-–-Volumes" class="headerlink" title="DOCKER BASIC COMMAND – Volumes"></a>DOCKER BASIC COMMAND – Volumes</h3><p>接下来准备按tutorial实践下存储方面的命令, 本篇主要是关于volume的。</p>
+<h4 id="Volume"><a href="#Volume" class="headerlink" title="Volume"></a>Volume</h4><pre><code>docker volume [Commands]
+Commands:
+create      Create a volume
+inspect     Display detailed information on one or more volumes
+ls          List volumes
+prune       Remove all unused volumes
+rm          Remove one or more volumes
+</code></pre><p>只有这几个命令，很容易使用；举例创建一个名字为myvol_new的volume，然后查询的命令分别为：<br>    docker volume create myvol_new<br>    docker volume inspect myvol_new</p>
+<p>其输出为:</p>
+<pre><code>[
+    {
+        &quot;CreatedAt&quot;: &quot;2017-12-18T14:38:42Z&quot;,
+        &quot;Driver&quot;: &quot;local&quot;,
+        &quot;Labels&quot;: null,
+        &quot;Mountpoint&quot;: &quot;/var/lib/docker/volumes/myvol_new/_data&quot;,
+        &quot;Name&quot;: &quot;myvol_new&quot;,
+        &quot;Options&quot;: {},
+        &quot;Scope&quot;: &quot;local&quot;
+    }
+]
+</code></pre><h4 id="Create-Volume-Automatically-amp-Mount-Option"><a href="#Create-Volume-Automatically-amp-Mount-Option" class="headerlink" title="Create Volume Automatically &amp; Mount Option"></a>Create Volume Automatically &amp; Mount Option</h4><p>除了直接创建volume外，也可以通过启动container或创建service的时候挂载容器，假如容器此前不存在则会自动创建。<br>如下面的例子就是以busybox镜像创建名为test的container，挂载volume到容器内的/app目录，如myvol此前不存在则会自动创建此volume。</p>
+<pre><code>docker run -d \
+-it \
+--name test \
+--mount source=myvol,target=/app \
+busybox:latest
+</code></pre><p>创建服务类似，服务可以指定创建多少个实例，使用–replicas参数，比如下面这个例子是创建4个container， 而且挂载myvol2到容器内的/app目录。<br>值得注意的是，这个volume是多个container共享的。  加上readonly参数则是表示容器内对该挂载目录内容只读。</p>
+<pre><code>docker service create -d \
+--replicas=4 \
+--name test-service \
+--mount source=myvol2,target=/app, readonly \
+busybox:latest
+</code></pre><p>另外有一点值得一提，假如启动容器的时候创建了一个新容器，如上面的例子挂载到了/app目录，假如这个容器的该目录（挂载的目录）已经存在文件或者目录，那么内容将会被拷贝到volume。 而且由于被拷贝到volume，其它挂载了该容器的container也能够访问这些内容。 下面给出一个例子，假如挂载的目录是/usr，已经存在的/sbin则会copy到volume中:</p>
+<p><img src="/2017/12/18/Docker-Basic-Command-03/pre-populate.png" alt="pre-populate"></p>
+<h4 id="Volume-Driver"><a href="#Volume-Driver" class="headerlink" title="Volume Driver"></a>Volume Driver</h4><p>Docker可以使用不同的volume driver， 比如通过下面命令来通过安装插件的方式安装新的volume driver:</p>
+<pre><code>docker plugin install --grant-all-permissions vieux/sshfs
+</code></pre><p>然后创建volume的时候可以指定volume driver:</p>
+<pre><code>$ docker volume create --driver vieux/sshfs \
+-o sshcmd=test@node2:/home/test \
+-o password=testpassword \
+sshvolume
+</code></pre><h4 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h4><p>这篇就暂时到这里，主要列出了一些volume的用法。 下篇打算动手了解下tempfs 和 bind mounts。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;DOCKER-BASIC-COMMAND-–-Volumes&quot;&gt;&lt;a href=&quot;#DOCKER-BASIC-COMMAND-–-Volumes&quot; class=&quot;headerlink&quot; title=&quot;DOCKER BASIC COMMAND – Volumes&quot;&gt;
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="https://bournexian.github.io/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker_Basic_Command_02</title>
+    <link href="https://bournexian.github.io/2017/12/12/Docker-Basic-Command-02/"/>
+    <id>https://bournexian.github.io/2017/12/12/Docker-Basic-Command-02/</id>
+    <published>2017-12-12T14:46:59.000Z</published>
+    <updated>2017-12-23T14:33:45.813Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="DOCKER-BASIC-COMMAND-–-Dockerfile-amp-build-image"><a href="#DOCKER-BASIC-COMMAND-–-Dockerfile-amp-build-image" class="headerlink" title="DOCKER BASIC COMMAND – Dockerfile &amp; build image"></a>DOCKER BASIC COMMAND – Dockerfile &amp; build image</h3><p>上篇文章讲了一下基础的命令，这篇将继续围绕镜像展开。<br>NOTE: Win 环境下要切换container模式为Linux</p>
+<h4 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h4><p>使用docker run可以创建一个镜像的实例 即容器，举个例子我要使用python框架运行一个web应用，那么我就要使用python镜像运行一个容器，然后在此基础上我需要安装Flask框架以及Redis存储系统，最后再执行python程序setup起一个web服务.</p>
+<p>那么有没办法基于python镜像的基础上，添加我们自己的应用，然后打包成一个新镜像呢？ – Dockerfile就是应用在此的.</p>
+<p>下面就使用一个docker官网的例子说明， 新建一个目录，然后cd到目录内，创建文件Dockerfile，内容如下:</p>
+<pre><code># Use an official Python runtime as a parent image
+FROM python:2.7-slim
+
+# Set the working directory to /app
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+ADD . /app
+
+# Install any needed packages specified in requirements.txt
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+
+# Make port 80 available to the world outside this container
+EXPOSE 80
+
+# Define environment variable
+ENV NAME World
+
+# Run app.py when the container launches
+CMD [&quot;python&quot;, &quot;app.py&quot;]
+</code></pre><p>上面的命令其实就是指定python 作为baseimage, 在此基础上指定工作目录，拷贝当前目录进容器，根据requirements.txt列出的包名安装软件，暴露端口，执行python应用.</p>
+<p>创建requirements.txt, Dockerfile中会通过python自带的pip包管理器安装这个文件里所列出的软件包名, 内容如下:</p>
+<pre><code>Flask
+Redis
+</code></pre><p>创建文件app.py, 这个是python程序文件，使用了Redis存储和Flask框架创建一个web服务并监听80端口请求，内容如下:<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</div><div class="line"><span class="keyword">from</span> redis <span class="keyword">import</span> Redis, RedisError</div><div class="line"><span class="keyword">import</span> os</div><div class="line"><span class="keyword">import</span> socket</div><div class="line"></div><div class="line"><span class="comment"># Connect to Redis</span></div><div class="line">redis = Redis(host=<span class="string">"redis"</span>, db=<span class="number">0</span>, socket_connect_timeout=<span class="number">2</span>, socket_timeout=<span class="number">2</span>)</div><div class="line"></div><div class="line">app = Flask(__name__)</div><div class="line"></div><div class="line"><span class="meta">@app.route("/")</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">try</span>:</div><div class="line">        visits = redis.incr(<span class="string">"counter"</span>)</div><div class="line">    <span class="keyword">except</span> RedisError:</div><div class="line">        visits = <span class="string">"&lt;i&gt;cannot connect to Redis, counter disabled&lt;/i&gt;"</span></div><div class="line"></div><div class="line">    html = <span class="string">"&lt;h3&gt;Hello &#123;name&#125;!&lt;/h3&gt;"</span> \</div><div class="line">        <span class="string">"&lt;b&gt;Hostname:&lt;/b&gt; &#123;hostname&#125;&lt;br/&gt;"</span> \</div><div class="line">        <span class="string">"&lt;b&gt;Visits:&lt;/b&gt; &#123;visits&#125;"</span></div><div class="line">    <span class="keyword">return</span> html.format(name=os.getenv(<span class="string">"NAME"</span>, <span class="string">"world"</span>), hostname=socket.gethostname(), visits=visits)</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    app.run(host=<span class="string">'0.0.0.0'</span>, port=<span class="number">80</span>)</div></pre></td></tr></table></figure></p>
+<p>有了以上三个文件后，我们就可以创建一个新镜像了.</p>
+<h4 id="Build-image"><a href="#Build-image" class="headerlink" title="Build image"></a>Build image</h4><pre><code>docker build -t friendlyhello .
+</code></pre><p>使用上面的命令创建新镜像，其中-t是–tag list 的缩写，可以指定镜像的名字以及tag； 在这个例子里面没有指定tag， 就使用默认值latest. 而末尾 . 的意思是build使用的Dockerfile的路径在当前目录.</p>
+<blockquote>
+<p>tag 就是镜像的标签， 比如当我们去pull image的时候，想pull的python版本是2.7而不是3.6的时候就可以指定tag. e.g. python:2.7.  </p>
+</blockquote>
+<p>如无意外，一个新的镜像就创建好了； 使用上篇使用过的命令来执行:</p>
+<pre><code>docker run -p 4000:80 friendlyhello
+</code></pre><p>这样会把容器内部的80端口，mapping到host机器的4000端口，打开浏览器访问localhost:4000 就可以访问到一个测试的页面.<br><img src="/2017/12/12/Docker-Basic-Command-02/friendlyhello.png" alt="friendlyhello running in Browser"></p>
+<p>由于默认会把log输出，press Ctrl+C 退出，但容器仍然在后台运行，可以使用docker ps -a 查看. </p>
+<p>假如此时想用interactive mode去连接进container，可以使用container名字也可以使用container id （可以取前4位简写）, 执行命令：</p>
+<pre><code>docker exec -it 5ebc /bin/bash
+</code></pre><p>假如想停掉这个容器的话，可以使用:</p>
+<pre><code>docker container stop 5ebc
+</code></pre><h4 id="Share-image"><a href="#Share-image" class="headerlink" title="Share image"></a>Share image</h4><p>可以将上面步骤创建的image发布到docker hub，来共享自己创建的镜像。<br>使用命令登陆dockerid:</p>
+<pre><code>docker login
+</code></pre><p>使用命令为image打tag:</p>
+<pre><code>docker tag [yourimagename] username/repository:tag
+</code></pre><p>Upload镜像:</p>
+<pre><code>docker push username/repository:tag
+</code></pre><h4 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h4><p>本篇主要介绍了下image相关的基础命令和如何上传到软件仓库. </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;DOCKER-BASIC-COMMAND-–-Dockerfile-amp-build-image&quot;&gt;&lt;a href=&quot;#DOCKER-BASIC-COMMAND-–-Dockerfile-amp-build-image&quot; class=&quot;headerlink&quot; t
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="https://bournexian.github.io/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Docker_Basic_Command_01</title>
+    <link href="https://bournexian.github.io/2017/12/10/Docker-Basic-Command/"/>
+    <id>https://bournexian.github.io/2017/12/10/Docker-Basic-Command/</id>
+    <published>2017-12-10T13:03:41.000Z</published>
+    <updated>2017-12-23T14:33:03.925Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="DOCKER-BASIC-COMMAND-–-container-amp-images"><a href="#DOCKER-BASIC-COMMAND-–-container-amp-images" class="headerlink" title="DOCKER BASIC COMMAND – container &amp; images"></a>DOCKER BASIC COMMAND – container &amp; images</h3><h4 id="Prerequisites"><a href="#Prerequisites" class="headerlink" title="Prerequisites"></a>Prerequisites</h4><ul>
+<li>Docker for Windows installed </li>
+<li>Basic knowledge of linux/powershell command</li>
+<li>DockerID registered</li>
+</ul>
+<p>如果选择的是windows平台, 可以安装docker for windows. </p>
+<p>NOTE: 由于默认源是从docker hub官方地址拉取镜像,建议注册阿里云账号并更换源地址为阿里云加速地址.<br>在Settings-&gt;Daemon中配置Registry mirrors:<img src="/2017/12/10/Docker-Basic-Command/Change_registry_mirrors_address.png" alt="Change_registry_mirrors_address"><br>更换源后貌似还需要删掉默认源地址，具体的配置文件路径忘了…</p>
+<p>如果选择的是linux平台，可以选择安装linux系统； 对于linux不熟悉的可以使用Online environment <a href="http://training.play-with-docker.com" target="_blank" rel="external">docker classroom</a>.</p>
+<h4 id="Run-the-Docker-containers"><a href="#Run-the-Docker-containers" class="headerlink" title="Run the Docker containers"></a>Run the Docker containers</h4><p>Docker 容器能够以三种不同方式来运行:</p>
+<ol>
+<li>执行单独的任务. e.g. Shell script 或者指定的程序. </li>
+<li>交互式地运行. 连接到容器内的虚拟环境, 类似使用SSH连接到远程服务器.</li>
+<li>在后台运行.  通常在一些长时间运行的服务里用到，比如Web服务器或者数据库.</li>
+</ol>
+<p>基本命令</p>
+<blockquote>
+<p>docker container [commands]</p>
+</blockquote>
+<p>下面介绍的是Windows下面的命令，确保设定使用的是Windows containers而非Linux containers.</p>
+<ul>
+<li><p>单独任务</p>
+<blockquote>
+<p>docker container run microsoft/nanoserver powershell hostname</p>
+</blockquote>
+<p>  比如上面的命令是使用nanoserver镜像创建容器，然后再在容器里面运行hostname命令.</p>
+<p>  由于nanoserver镜像在本地不存在，所以就会从docker hub (官方仓库) /配置的源拉取镜像.<br>  在执行完命令hostname后，就会退出container.</p>
+</li>
+<li><p>交互式</p>
+<blockquote>
+<p>docker container run -it –rm microsoft/nanoserver powershell</p>
+</blockquote>
+<p>  比如上面命令是在容器里打开powershell命令，之后交互地执行命令; </p>
+<p>  -it  参数分别代表interactive和tty，意味着交互式地运行容器，并且连接一个命令行的session.<br>  –rm 参数代表当容器推出后自动删除容器. </p>
+</li>
+<li><p>后台运行</p>
+<blockquote>
+<p>docker container run -d -p 80:80 –name iis microsoft/iis</p>
+</blockquote>
+<p>  上面命令是后台创建一个容器运行IIS服务.</p>
+<p>  -d 参数代表detach，意味着后台运行.<br>  -p 参数发布端口，将容器内的iis的80端口mapping到host机器的80端口.</p>
+</li>
+</ul>
+<p>如何查找后台运行的容器呢？可以通过以下命令:</p>
+<blockquote>
+<p>docker container ls</p>
+</blockquote>
+<p>or</p>
+<blockquote>
+<p>docker ps</p>
+</blockquote>
+<p>-a 参数可以列出运行过但已经退出的容器.</p>
+<h4 id="The-images"><a href="#The-images" class="headerlink" title="The images"></a>The images</h4><p>列出本地已经拉取的镜像列表.</p>
+<blockquote>
+<p>docker images</p>
+</blockquote>
+<p>从镜像仓库拉取镜像或者发布镜像</p>
+<blockquote>
+<p>docker pull/push</p>
+</blockquote>
+<p>从tar文件导入image</p>
+<blockquote>
+<p>docker import</p>
+</blockquote>
+<p>NOTE：<br>命令太多就不详述，使用–help查阅帮助文档可以获取详细的使用方法:</p>
+<blockquote>
+<p>[commands] –help</p>
+</blockquote>
+<p>对于每个参数都有详细解释. 类似linux里面的man.</p>
+<p>另外除了命令行，还可以使用图形界面管理docker: <strong>Kitematic</strong><br><img src="/2017/12/10/Docker-Basic-Command/Kitematic.png" alt="Kitematic"></p>
+<p>可以搜索镜像，查看自己publish到仓库的镜像，查看本地镜像，创建container等，很方便。</p>
+<p>Reference:<br><a href="https://github.com/docker/labs" target="_blank" rel="external">docker lab</a><br><a href="http://training.play-with-docker.com" target="_blank" rel="external">play with docker</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;DOCKER-BASIC-COMMAND-–-container-amp-images&quot;&gt;&lt;a href=&quot;#DOCKER-BASIC-COMMAND-–-container-amp-images&quot; class=&quot;headerlink&quot; title=&quot;DOCKER
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="https://bournexian.github.io/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>docker_concepts</title>
+    <link href="https://bournexian.github.io/2017/12/07/docker-concepts/"/>
+    <id>https://bournexian.github.io/2017/12/07/docker-concepts/</id>
+    <published>2017-12-07T02:43:22.000Z</published>
+    <updated>2017-12-10T13:01:03.456Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="DOCKER-CONCEPTS"><a href="#DOCKER-CONCEPTS" class="headerlink" title="DOCKER CONCEPTS"></a>DOCKER CONCEPTS</h3><p>随着近年来DevOps以及微服务概念的流行， Docker技术变得火热.<br>最近有时间可以学习下，顺带记录下笔记. </p>
+<p>Docker 基础概念</p>
+<h4 id="Image"><a href="#Image" class="headerlink" title="Image:"></a>Image:</h4><p>An image is a lightweight, stand-alone, executable package that includes everything needed to run a piece of software, including the code, a runtime, libraries, environment variables, and config files.</p>
+<p>换做以前的概念，可以理解成一个打包好的“ISO”，不但操作系统，代码，运行时等都囊括了；<br>使用了Union FS系统，可以理解成有很多层，如BaseImage 是操作系统层 e.g.Ubuntu; 其上层可以是Nginx image/Apache image; 依赖于增量式保存本层和上一层的差异，所以比较轻量size也比叫小.</p>
+<p>Pros:<br>由于所有依赖(甚至操作系统)都包含在镜像中， 所以可以确保无论部署在哪个环境中都有相同的效果。 跟以前只打包程序，然后发布到实体机/虚拟机服务器相比，不会出现一些环境配置差异的问题； 比如最近就遇到QA环境打了SQLServer 补丁而Dev machine没有打补丁，发现behavior不一致的问题，不利于调试； </p>
+<p><img src="/2017/12/07/docker-concepts/docker_image_layers.jpg" alt="DockerImage_layers"></p>
+<h4 id="Container"><a href="#Container" class="headerlink" title="Container:"></a>Container:</h4><p>A container is a runtime instance of an image—what the image becomes in memory when actually executed. It runs completely isolated from the host environment by default, only accessing host files and ports if configured to do so.</p>
+<p>假如把Image类比做“ISO”， 那么容器可以理解成轻量级的“虚拟机”，上面说的Image是不能做修改的，只能把Image加载到容器中，我们才能基于它增加一层可写层，但这层可写层是只能容器内可见并且重启后会丢失的；<br>做类比的话，可以理解是”ISO”加载到了”虚拟机”进行了光驱启动，但是下次再开机就会丢失上次的改动了；假如要保留改动，就要保存到外部的”Volumes”.</p>
+<p><img src="/2017/12/07/docker-concepts/container-layers.jpg" alt="container-layers"></p>
+<h4 id="Volumes："><a href="#Volumes：" class="headerlink" title="Volumes："></a>Volumes：</h4><p>Volumes are stored in a part of the host filesystem which is managed by Docker (/var/lib/docker/volumes/ on Linux). Non-Docker processes should not modify this part of the filesystem. Volumes are the best way to persist data in Docker.</p>
+<p>由于上面说的原因， container的生命周期结束后，容器的可写层就会跟随销毁。故通常Docker中常用的持久化数据的方式是使用Volumes. Volume的优点有：</p>
+<ul>
+<li>Volumes can be more safely shared among multiple containers.</li>
+<li>Volumes are easier to back up or migrate than bind mounts.</li>
+<li>Volume drivers allow you to store volumes on remote hosts or cloud providers, to encrypt the contents of volumes, or to add other functionality.</li>
+</ul>
+<p>其实除了volume外，还有另外两种方法:</p>
+<ul>
+<li><p>bind mount<br>当时用绑定挂载的时候，host主机的一个文件或者目录会挂载到容器里面. 感觉像linux 里面的link链接.<br>Question:<br>同一目录当能否绑定挂载到多个container里面？？ 有待试验</p>
+</li>
+<li><p>tmpfs mount<br>用于临时存放一次性数据，存储在host机器的内存(或者swap). 而且当容器停止后， tempfs就会自动remove; 容器保存的时候也会exclude tempfs.</p>
+</li>
+</ul>
+<p><img src="/2017/12/07/docker-concepts/types-of-mounts-volume.png" alt="types-of-mounts-volume"></p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>描述了一下Docker里面几个基本的概念，具体使用的命令将留到下篇继续.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;DOCKER-CONCEPTS&quot;&gt;&lt;a href=&quot;#DOCKER-CONCEPTS&quot; class=&quot;headerlink&quot; title=&quot;DOCKER CONCEPTS&quot;&gt;&lt;/a&gt;DOCKER CONCEPTS&lt;/h3&gt;&lt;p&gt;随着近年来DevOps以及微服务概念
+    
+    </summary>
+    
+    
+      <category term="docker" scheme="https://bournexian.github.io/tags/docker/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>machinelearning-week8</title>
+    <link href="https://bournexian.github.io/2017/10/04/machinelearning-week8/"/>
+    <id>https://bournexian.github.io/2017/10/04/machinelearning-week8/</id>
+    <published>2017-10-04T08:30:19.000Z</published>
+    <updated>2017-10-09T12:58:37.363Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="机器学习-第8周"><a href="#机器学习-第8周" class="headerlink" title="机器学习 第8周"></a>机器学习 第8周</h2><p>这周开始介绍 非监督型学习， 区分于监督型学习 这里的training set不会带有标签（label）。</p>
+<h3 id="K-Means"><a href="#K-Means" class="headerlink" title="K-Means"></a>K-Means</h3><h4 id="K-Means-Algorithm"><a href="#K-Means-Algorithm" class="headerlink" title="K-Means Algorithm"></a>K-Means Algorithm</h4><p>K-Means 是用来自动对数据分组最常见的算法，其步骤为：</p>
+<ol>
+<li>Randomly initialize two points in the dataset called the cluster centroids.</li>
+<li>Cluster assignment: assign all examples into one of two groups based on which cluster centroid the example is closest to.</li>
+<li>Move centroid: compute the averages for all the points inside each of the two cluster centroid groups, then move the cluster centroid points to those averages.</li>
+<li>Re-run (2) and (3) until we have found our clusters.</li>
+</ol>
+<p>NOTE：<br>With k-means, it is not possible for the cost function to sometimes increase. It should always descend.</p>
+<h4 id="Random-Initialization"><a href="#Random-Initialization" class="headerlink" title="Random Initialization"></a>Random Initialization</h4><ol>
+<li>Have K&lt;m. That is, make sure the number of your clusters is less than the number of your training examples.</li>
+<li>Randomly pick K training examples. (Not mentioned in the lecture, but also be sure the selected examples are unique).</li>
+<li>Set μ1,…,μK equal to these K examples.</li>
+</ol>
+<h3 id="Dimensionality-Reduction"><a href="#Dimensionality-Reduction" class="headerlink" title="Dimensionality Reduction"></a>Dimensionality Reduction</h3><h4 id="Data-Compression-amp-Visualization"><a href="#Data-Compression-amp-Visualization" class="headerlink" title="Data Compression &amp; Visualization"></a>Data Compression &amp; Visualization</h4><p>Reduce the dimension of features if there are a lot of redundant data.</p>
+<h4 id="Principal-Component-Analysis-Problem-Formulation"><a href="#Principal-Component-Analysis-Problem-Formulation" class="headerlink" title="Principal Component Analysis Problem Formulation"></a>Principal Component Analysis Problem Formulation</h4><p>The most popular dimensionality reduction algorithm is Principal Component Analysis (PCA)<br>The <strong>goal of PCA</strong> is to <strong>reduce</strong> the average of all the distances of every feature to the projection line. This is the projection error.</p>
+<h4 id="PCA-Algorithm"><a href="#PCA-Algorithm" class="headerlink" title="PCA Algorithm"></a>PCA Algorithm</h4><ul>
+<li>Given training set: x(1),x(2),…,x(m)</li>
+<li>Preprocess (feature scaling/mean normalization):
+$$\mu_j = \dfrac{1}{m}\sum^m_{i=1}x_j^{(i)}$$
+ </li>
+<li>Replace each $x_j^{(i)}$ with $x_j^{(i)} - \mu_j$</li>
+<li>If different features on different scales (e.g., $x_1$ = size of house, $x_2$ = number of bedrooms), scale features to have comparable range of values.</li>
+</ul>
+<h4 id="Reconstruction"><a href="#Reconstruction" class="headerlink" title="Reconstruction"></a>Reconstruction</h4><p>Get approximate value of original data by compressed data.<br> 
+$$z \in \mathbb{R} \rightarrow x \in \mathbb{R}^2$$
+$$x_{approx}^{(1)} = U_{reduce} \cdot z^{(1)}$$
+ </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;机器学习-第8周&quot;&gt;&lt;a href=&quot;#机器学习-第8周&quot; class=&quot;headerlink&quot; title=&quot;机器学习 第8周&quot;&gt;&lt;/a&gt;机器学习 第8周&lt;/h2&gt;&lt;p&gt;这周开始介绍 非监督型学习， 区分于监督型学习 这里的training set不会带有标签（
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>machinelearning-week7</title>
+    <link href="https://bournexian.github.io/2017/10/04/machinelearning-week7/"/>
+    <id>https://bournexian.github.io/2017/10/04/machinelearning-week7/</id>
+    <published>2017-10-04T08:27:15.000Z</published>
+    <updated>2017-10-04T15:37:25.629Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="机器学习-第7周"><a href="#机器学习-第7周" class="headerlink" title="机器学习 第7周"></a>机器学习 第7周</h2><p>第七周，主要是监督学习方面的SVM算法, 区别于之前几周学的Logistic Regression.</p>
+<h3 id="Formula"><a href="#Formula" class="headerlink" title="Formula"></a>Formula</h3> 
+$$J(\theta) = \frac{1}{m} \sum_{i=1}^m y^{(i)} \ \text{cost}_1(\theta^Tx^{(i)}) + (1 - y^{(i)}) \ \text{cost}_0(\theta^Tx^{(i)}) + \dfrac{\lambda}{2m}\sum_{j=1}^n \Theta^2_j$$
+ 
+<p>这里可以看作是找出一个向量，使得不同样本的投影到这个向量的距离最大化。</p>
+<h3 id="Kernels"><a href="#Kernels" class="headerlink" title="Kernels"></a>Kernels</h3><p>Gaussian Kernel:<br> 
+$$f_i = similarity(x, l^{(i)}) = \exp(-\dfrac{\sum^n_{j=1}(x_j-l_j^{(i)})^2}{2\sigma^2})$$
+ </p>
+<p>还未深入了解，要先补补数学基础，不过这个Kernel函数应该是可以简化SVM的计算，所以常常一起配合使用。</p>
+<h3 id="Logistic-Regression-vs-SVMs"><a href="#Logistic-Regression-vs-SVMs" class="headerlink" title="Logistic Regression vs. SVMs"></a>Logistic Regression vs. SVMs</h3><p>If n is large (relative to m), then use logistic regression, or SVM without a kernel (the “linear kernel”)</p>
+<p>If n is small and m is intermediate, then use SVM with a Gaussian Kernel</p>
+<p>If n is small and m is large, then manually create/add more features, then use logistic regression or SVM without a kernel.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;机器学习-第7周&quot;&gt;&lt;a href=&quot;#机器学习-第7周&quot; class=&quot;headerlink&quot; title=&quot;机器学习 第7周&quot;&gt;&lt;/a&gt;机器学习 第7周&lt;/h2&gt;&lt;p&gt;第七周，主要是监督学习方面的SVM算法, 区别于之前几周学的Logistic Regress
+    
+    </summary>
+    
+    
+      <category term="machinelearning" scheme="https://bournexian.github.io/tags/machinelearning/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>machinelearning-week6</title>
+    <link href="https://bournexian.github.io/2017/09/18/machinelearning-week6/"/>
+    <id>https://bournexian.github.io/2017/09/18/machinelearning-week6/</id>
+    <published>2017-09-18T14:57:47.000Z</published>
+    <updated>2017-09-18T15:12:30.030Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="机器学习-第6周"><a href="#机器学习-第6周" class="headerlink" title="机器学习 第6周"></a>机器学习 第6周</h2><p>第六周主要讲的是如何评估当前的算法并进行改进. 下面是lecture notes的摘抄.</p>
+<h3 id="Train-Validation-Test-Sets"><a href="#Train-Validation-Test-Sets" class="headerlink" title="Train/Validation/Test Sets"></a>Train/Validation/Test Sets</h3><p>这里主要引入了一个cross validation的概念，比如把总体样本分成3份，60%作为training set， 20%作为Cross Validation，剩下的作为test set; 然后基于下面的方法来计算不同的偏差值:</p>
+<ol>
+<li>Optimize the parameters in Θ using the training set for each polynomial degree.</li>
+<li>Find the polynomial degree d with the least error using the <strong>cross validation</strong> set.</li>
+<li>Estimate the generalization error using the test set with Jtest(Θ(d)), (d = theta from polynomial with lower error);</li>
+</ol>
+<h3 id="Diagnosing-Bias-vs-Variance"><a href="#Diagnosing-Bias-vs-Variance" class="headerlink" title="Diagnosing Bias vs. Variance"></a>Diagnosing Bias vs. Variance</h3><ul>
+<li>High bias (underfitting): both Jtrain(Θ) and JCV(Θ) will be high. Also, JCV(Θ)≈Jtrain(Θ).</li>
+<li>High variance (overfitting): Jtrain(Θ) will be low and JCV(Θ) will be much greater than Jtrain(Θ).</li>
+</ul>
+<h3 id="Learning-Curves"><a href="#Learning-Curves" class="headerlink" title="Learning Curves"></a>Learning Curves</h3><ul>
+<li>If a learning algorithm is suffering from high bias, getting more training data will not (by itself) help much.</li>
+<li>If a learning algorithm is suffering from high variance, getting more training data is likely to help.</li>
+</ul>
+<h3 id="Deside-What-to-Do-Next"><a href="#Deside-What-to-Do-Next" class="headerlink" title="Deside What to Do Next"></a>Deside What to Do Next</h3><ul>
+<li>Getting more training examples: Fixes high variance</li>
+<li>Trying smaller sets of features: Fixes high variance</li>
+<li>Adding features: Fixes high bias</li>
+<li>Adding polynomial features: Fixes high bias</li>
+<li>Decreasing λ: Fixes high bias</li>
+<li>Increasing λ: Fixes high variance.</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;机器学习-第6周&quot;&gt;&lt;a href=&quot;#机器学习-第6周&quot; class=&quot;headerlink&quot; title=&quot;机器学习 第6周&quot;&gt;&lt;/a&gt;机器学习 第6周&lt;/h2&gt;&lt;p&gt;第六周主要讲的是如何评估当前的算法并进行改进. 下面是lecture notes的摘抄.&lt;/
+    
+    </summary>
+    
+    
+      <category term="machinelearning" scheme="https://bournexian.github.io/tags/machinelearning/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Migrating to ASP.NET Core 2.0</title>
+    <link href="https://bournexian.github.io/2017/09/13/Migrating-to-ASP-NET-Core-2-0/"/>
+    <id>https://bournexian.github.io/2017/09/13/Migrating-to-ASP-NET-Core-2-0/</id>
+    <published>2017-09-13T05:18:05.000Z</published>
+    <updated>2017-09-18T14:54:37.534Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Migrating-to-ASP-NET-Core-2-0"><a href="#Migrating-to-ASP-NET-Core-2-0" class="headerlink" title="Migrating to ASP.NET Core 2.0"></a>Migrating to ASP.NET Core 2.0</h1><p>总结下从ASP.NET迁移到ASP.NET Core 2.0要注意的地方.</p>
+<h2 id="项目文件结构的改变"><a href="#项目文件结构的改变" class="headerlink" title="项目文件结构的改变"></a>项目文件结构的改变</h2><p>项目文件 .csproj 格式在ASP.NET Core 里面将更加简单， 主要体现在以下几个方面:</p>
+<ul>
+<li><p>不需要显示标记项目里面包含了哪些文件.<br>E.g. 以前会在项目文件里面说明需要compile的文件</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">Compile</span> <span class="attr">Include</span>=<span class="string">"Properties\AssemblyInfo.cs"</span> /&gt;</span></div></pre></td></tr></table></figure>
+<p>  Comment: 以后再也不用担心加了文件但是忘记把.csproj也check in导致找不到文件的情况了。 感觉应该是扫描目录下面的文件？ 那么假如某些文件不想include进proj呢？ 很简单只需要 </p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">Compile</span> <span class="attr">Remove</span>=<span class="string">"foo.cs"</span> /&gt;</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>不需要基于GUID来引用其它项目.</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">ItemGroup</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">ProjectReference</span> <span class="attr">Include</span>=<span class="string">"..\Parent\AnotherProj.csproj"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">ItemGroup</span>&gt;</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>项目文件以前需要unload然后才能编辑，现在可以直接右键编辑.</p>
+</li>
+</ul>
+<h2 id="替代Global-asax"><a href="#替代Global-asax" class="headerlink" title="替代Global.asax"></a>替代Global.asax</h2><p>以前会使用Global.asax文件来作为ASP.NET应用的入口，使用这个文件来进行 route configuration, area registration;</p>
+<p>现在使用 Startup.cs 文件作为入口，来configure services and request pipeline.<br>ASP.NET Core 不依赖于OWIN来处理entry，而是通过<em>Program.cs</em> 里面的Main方法来加载Startup;<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">WebHost.CreateDefaultBuilder(args)</div><div class="line">            .UseStartup&lt;Startup&gt;()</div><div class="line">            .Build();</div></pre></td></tr></table></figure></p>
+<p>Startup里面的Congiure方法可以配置requset pipeline, 比如下面的例子配置静态文件服务；</p>
+<h2 id="提供静态文件服务"><a href="#提供静态文件服务" class="headerlink" title="提供静态文件服务"></a>提供静态文件服务</h2><p>在ASP.NET中， 静态文件可以存储在多个目录然后在视图里面被引用；<br>在ASP.NET Core，静态文件默认放在wwwroot下面，可以通过调用 <code>UseStaticFiles</code> 方法来加载这些静态文件进入request pipeline；</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Configure</span>(<span class="params">IApplicationBuilder app</span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">   app.UseStaticFiles();</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="保存settings配置信息"><a href="#保存settings配置信息" class="headerlink" title="保存settings配置信息"></a>保存settings配置信息</h2><p>以前的习惯做法是把配置信息作为key-value键值对放在<em>Web.config</em>的<code>&lt;appSettings&gt;</code>里面<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">appSettings</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">add</span> <span class="attr">key</span>=<span class="string">"UserName"</span> <span class="attr">value</span>=<span class="string">"User"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">appSettings</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>然后通过<code>ConfigurationManager.AppSettings</code>来获取配置信息:<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">string</span> userName = System.Web.Configuration.ConfigurationManager.AppSettings[<span class="string">"UserName"</span>];</div></pre></td></tr></table></figure></p>
+<p>在ASP.NET Core中, 默认使用appsettings.json来存储configuration data； 下面是一个sample：<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">&#123;</div><div class="line">  <span class="attr">"Logging"</span>: &#123;</div><div class="line">    <span class="attr">"IncludeScopes"</span>: <span class="literal">false</span>,</div><div class="line">    <span class="attr">"LogLevel"</span>: &#123;</div><div class="line">      <span class="attr">"Default"</span>: <span class="string">"Debug"</span>,</div><div class="line">      <span class="attr">"System"</span>: <span class="string">"Information"</span>,</div><div class="line">      <span class="attr">"Microsoft"</span>: <span class="string">"Information"</span></div><div class="line">    &#125;</div><div class="line">  &#125;,</div><div class="line">  // Name of section is your choice</div><div class="line">  "AppConfiguration": &#123;</div><div class="line">    "UserName": "UserName"</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>在Startup.cs里面会作为<code>IConfiguration</code>的一个实例加载这个json文件，代码如下：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="title">Startup</span>(<span class="params">IConfiguration configuration</span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    Configuration = configuration;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">public</span> IConfiguration Configuration &#123; <span class="keyword">get</span>; &#125;</div></pre></td></tr></table></figure></p>
+<p>获取配置信息的代码：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">string</span> userName = Configuration.GetSection(<span class="string">"AppConfiguration"</span>)[<span class="string">"UserName"</span>];</div></pre></td></tr></table></figure></p>
+<h2 id="原生的依赖注入"><a href="#原生的依赖注入" class="headerlink" title="原生的依赖注入"></a>原生的依赖注入</h2><p>依赖注入成为了ASP.NET Core的一部分， 所以可以在<em>Startup.cs</em>的ConfigureServices里配置服务:<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ConfigureServices</span>(<span class="params">IServiceCollection services</span>)</span></div><div class="line"><span class="function"></span>&#123;</div><div class="line">    <span class="comment">// Add application services.</span></div><div class="line">    services.AddTransient&lt;IProductRepository, ProductRepository&gt;();</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>Reference:<br><a href="https://docs.microsoft.com/en-us/aspnet/core/migration/proper-to-2x/(https://docs.microsoft.com/en-us/aspnet/core/migration/proper-to-2x/" target="_blank" rel="external">https://docs.microsoft.com/en-us/aspnet/core/migration/proper-to-2x/(https://docs.microsoft.com/en-us/aspnet/core/migration/proper-to-2x/</a>)</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;Migrating-to-ASP-NET-Core-2-0&quot;&gt;&lt;a href=&quot;#Migrating-to-ASP-NET-Core-2-0&quot; class=&quot;headerlink&quot; title=&quot;Migrating to ASP.NET Core 2.0&quot;&gt;&lt;/a
+    
+    </summary>
+    
+    
+      <category term="ASP.NET Core" scheme="https://bournexian.github.io/tags/ASP-NET-Core/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>machinelearning-week5</title>
+    <link href="https://bournexian.github.io/2017/09/12/machinelearning-week5/"/>
+    <id>https://bournexian.github.io/2017/09/12/machinelearning-week5/</id>
+    <published>2017-09-12T13:39:25.000Z</published>
+    <updated>2017-09-12T15:38:01.943Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="机器学习-第5周"><a href="#机器学习-第5周" class="headerlink" title="机器学习 第5周"></a>机器学习 第5周</h2><hr>
+<p>这周没什么update的，好像重点就是讲了下Backpropagation.</p>
+<h3 id="Cost-function"><a href="#Cost-function" class="headerlink" title="Cost function"></a>Cost function</h3><ul>
+<li>L = total number of layers in the network</li>
+<li>sl = number of units (not counting bias unit) in layer l</li>
+<li>K = number of output units/classes</li>
+</ul>
+<p>Cost function could be represented as:<br> 
+$$
+J(\theta) = - \frac{1}{m} \sum_{i=1}^m [ y^{(i)}\ \log (h_\theta (x^{(i)})) + (1 - y^{(i)})\ \log (1 - h_\theta(x^{(i)}))] + \frac{\lambda}{2m}\sum_{j=1}^n \theta_j^2
+$$
+ </p>
+<h3 id="To-calculate-delta"><a href="#To-calculate-delta" class="headerlink" title="To calculate delta:"></a>To calculate delta:</h3> 
+$$
+\Delta^{(l)} := \Delta^{(l)} + \delta^{(l+1)}(a^{(l)})^T
+$$
+ 
+<h3 id="Steps-for-back-propagation"><a href="#Steps-for-back-propagation" class="headerlink" title="Steps for back propagation"></a>Steps for back propagation</h3><ol>
+<li>Set $ a^{(1)} := x^{(t)} $</li>
+<li>Perform forward propagation to compute $a^{(l)}$ for l=2,3,…,L</li>
+<li>Using $ y^{(t)} $, compute $ \delta^{(L)} = a^{(L)} - y^{(t)} $</li>
+<li>Compute $ \delta^{(L-1)}, \delta^{(L-2)},\dots,\delta^{(2)} $ using  $ \delta^{(l)} = ((\Theta^{(l)})^T \delta^{(l+1)})\ .*\ a^{(l)}\ .*\ (1 - a^{(l)})   $</li>
+<li>The capital-delta matrix D is used as an “accumulator” to add up our values as we go along and eventually compute our partial derivative.
+$$ 
+\frac \partial {\partial \Theta_{ij}^{(l)}} J(\Theta) = D_{ij}^{(l)}
+$$
+ 
+and 
+$$
+  D^{(l)}_{i,j} := \dfrac{1}{m}\left(\Delta^{(l)}_{i,j} + \lambda\Theta^{(l)}_{i,j}\right) 
+$$
+$$
+  D^{(l)}_{i,j} := \dfrac{1}{m}\Delta^{(l)}_{i,j}
+$$
+ 
+</li>
+</ol>
+<p> Notes from:<br> <a href="https://www.coursera.org/learn/machine-learning/supplement/pjdBA/backpropagation-algorithm" target="_blank" rel="external">coursera machine learning</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;机器学习-第5周&quot;&gt;&lt;a href=&quot;#机器学习-第5周&quot; class=&quot;headerlink&quot; title=&quot;机器学习 第5周&quot;&gt;&lt;/a&gt;机器学习 第5周&lt;/h2&gt;&lt;hr&gt;
+&lt;p&gt;这周没什么update的，好像重点就是讲了下Backpropagation.&lt;/p
+    
+    </summary>
+    
+    
+      <category term="machinelearning" scheme="https://bournexian.github.io/tags/machinelearning/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>machinelearning-week4</title>
+    <link href="https://bournexian.github.io/2017/09/05/machinelearning-week4/"/>
+    <id>https://bournexian.github.io/2017/09/05/machinelearning-week4/</id>
+    <published>2017-09-05T14:29:52.000Z</published>
+    <updated>2017-09-18T14:54:37.534Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="机器学习-第4周"><a href="#机器学习-第4周" class="headerlink" title="机器学习 第4周"></a>机器学习 第4周</h2><p>原来mathjax公式是可以通过右键复制的，囧， 好吧，讲义里面的公式就不用手打了~~~ 新技能get✓</p>
+<p>As non-linear hypotheses become complex when more features included, an alternate way is neural networks.</p>
+<p>In neural networks, we label the intermediate layer nodes $ a_0^2 … a_n^2 $ and call them activation units.<br> 
+$$
+\begin{align*}& a_i^{(j)} = \text{"activation" of unit $i$ in layer $j$} \newline& \Theta^{(j)} = \text
+{matrix of weights controlling function mapping from layer $j$ to layer $j+1$}\end{align*}
+$$
+ </p>
+<p>For example, a neural network with one intermediate layer looks like:</p>
+ 
+$$
+\begin{bmatrix}x_0 \newline x_1 \newline x_2 \newline x_3\end{bmatrix}\rightarrow\begin{bmatrix}a_1^{(2)} \newline a_2^{(2)} \newline a_3^{(2)} \newline \end{bmatrix}\rightarrow h_\theta(x)
+ $$
+ 
+<p>The values of activation nodes:<br> 
+$$
+\begin{align*}
+a_1^{(2)} = g(\Theta_{10}^{(1)}x_0 + \Theta_{11}^{(1)}x_1 + \Theta_{12}^{(1)}x_2 + \Theta_{13}^{(1)}x_3) \newline
+a_2^{(2)} = g(\Theta_{20}^{(1)}x_0 + \Theta_{21}^{(1)}x_1 + \Theta_{22}^{(1)}x_2 + \Theta_{23}^{(1)}x_3) \newline
+a_3^{(2)} = g(\Theta_{30}^{(1)}x_0 + \Theta_{31}^{(1)}x_1 + \Theta_{32}^{(1)}x_2 + \Theta_{33}^{(1)}x_3) \newline
+h_\Theta(x) = a_1^{(3)} = g(\Theta_{10}^{(2)}a_0^{(2)} + \Theta_{11}^{(2)}a_1^{(2)} + \Theta_{12}^{(2)}a_2^{(2)} + \Theta_{13}^{(2)}a_3^{(2)}) \newline
+\end{align*}
+$$
+ </p>
+<p>The dimensions of the matrices of weights determined as follows:<br> 
+ $$
+ \text{If network has $s_j$ units in layer $j$ and $s_{j+1}$ units in layer $j+1$, then $\Theta^{(j)}$ will be of dimension $s_{j+1} \times (s_j + 1)$.}
+ $$
+ </p>
+<p>Make a new variable z to represent the parameters inside the g function.<br> 
+ $$
+ \begin{align*}a_1^{(2)} = g(z_1^{(2)}) \newline a_2^{(2)} = g(z_2^{(2)}) \newline a_3^{(2)} = g(z_3^{(2)}) \newline 
+ 
+ 
+\newline 
+ h_\Theta(x) = a^{(j+1)} = g(z^{(j+1)})
+ \end{align*}
+ 
+ $$
+ </p>
+<p>For  AND, NOR, and OR operation could be represented by neural network.<br>And these simple operation could be combined to get XNOR. </p>
+ 
+ $$
+\begin{align*}& a^{(2)} = g(\Theta^{(1)} \cdot x) \newline& a^{(3)} = g(\Theta^{(2)} \cdot a^{(2)}) \newline& h_\Theta(x) = a^{(3)}\end{align*}
+ $$
+ ]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;机器学习-第4周&quot;&gt;&lt;a href=&quot;#机器学习-第4周&quot; class=&quot;headerlink&quot; title=&quot;机器学习 第4周&quot;&gt;&lt;/a&gt;机器学习 第4周&lt;/h2&gt;&lt;p&gt;原来mathjax公式是可以通过右键复制的，囧， 好吧，讲义里面的公式就不用手打了~~~ 新
+    
+    </summary>
+    
+    
+      <category term="machinelearning" scheme="https://bournexian.github.io/tags/machinelearning/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>machinelearning-week3</title>
+    <link href="https://bournexian.github.io/2017/08/27/machinelearning-week3/"/>
+    <id>https://bournexian.github.io/2017/08/27/machinelearning-week3/</id>
+    <published>2017-08-27T03:23:25.000Z</published>
+    <updated>2017-08-27T05:20:49.326Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="机器学习-第三周"><a href="#机器学习-第三周" class="headerlink" title="机器学习 第三周"></a>机器学习 第三周</h2><h3 id="Classification-and-Representation"><a href="#Classification-and-Representation" class="headerlink" title="Classification and Representation"></a>Classification and Representation</h3><p>Summary of lecture notes from my point of view…</p>
+<h4 id="Classification"><a href="#Classification" class="headerlink" title="Classification"></a>Classification</h4><ul>
+<li>Binary classification problem</li>
+<li>Multi-class classification (one-vs-all)</li>
+</ul>
+<h3 id="Logistic-Regression"><a href="#Logistic-Regression" class="headerlink" title="Logistic Regression"></a>Logistic Regression</h3><h4 id="Hypothesis"><a href="#Hypothesis" class="headerlink" title="Hypothesis"></a>Hypothesis</h4><ul>
+<li>$ h_\theta(x)=g(\theta^Tx)  $</li>
+<li>$ z = \theta^Tx $ </li>
+<li>$ g(z) = \frac 1 {1+e^(-z)}$</li>
+<li><em>probability</em> $h_\theta(x)  = P(y=1|x;\theta) = 1-P(y=0|x;\theta)$</li>
+</ul>
+<h4 id="Cost-function-of-logistic-regression"><a href="#Cost-function-of-logistic-regression" class="headerlink" title="Cost function of logistic regression"></a>Cost function of logistic regression</h4><p>A vectorized implementation:<br>$ h = g(X\theta) $<br>$J(\theta) = \frac 1 m * (-y^Tlog(h)-(1-y)^Tlog(1-h)) $</p>
+<h4 id="Gradient-Descent"><a href="#Gradient-Descent" class="headerlink" title="Gradient Descent"></a>Gradient Descent</h4><p>The algorithm is same as the one used in linear regression, only the meaning of h(\theta) is changed to sigmoid function.</p>
+<p>Repeat{<br>    $\theta_j := \theta_j - \alpha \frac \partial {\partial \theta_j}J(\theta)$<br>}</p>
+<h3 id="Solving-the-problem-of-overfitting"><a href="#Solving-the-problem-of-overfitting" class="headerlink" title="Solving the problem of overfitting"></a>Solving the problem of overfitting</h3><h4 id="Overfitting"><a href="#Overfitting" class="headerlink" title="Overfitting"></a>Overfitting</h4><p>Overifitting is caused by a hypothesis function that fits the available data but does not generalize well to predict new data. It is usually caused by a complicated function that creates a lot of unnecessary curves and angles unrelated to the data.</p>
+<h4 id="Solution"><a href="#Solution" class="headerlink" title="Solution"></a>Solution</h4><p>1) Reduce the number of features:</p>
+<ul>
+<li>Manually select which features to keep.</li>
+<li>Use a model selection algorithm (studied later in the course).</li>
+</ul>
+<p>2) Regularization</p>
+<ul>
+<li>Keep all the features, but reduce the magnitude of parameters θj.</li>
+<li>Regularization works well when we have a lot of slightly useful features.</li>
+</ul>
+<h4 id="Regularization"><a href="#Regularization" class="headerlink" title="Regularization"></a>Regularization</h4><ul>
+<li><p>Regularized cost function</p>
+<blockquote>
+  
+    $ min_\theta \frac 1 {2m} \sum_{i=1}^m (h_\theta(x^{(i)})-y^{(i)})^2 + \lambda \sum_{j=1}^n \theta_j^2 $ 
+    
+</blockquote>
+</li>
+<li><p>Regularized linear regression</p>
+<blockquote>
+<p> Repeat  {</p>
+  
+    $\theta_0 := \theta_0 - \alpha \frac 1 m \sum_{i=1}^m(h_\theta(x^{(i)}) - y^{(i)})x_0^{(i)}$
+    <br>
+    $\theta_j := \theta_j - \alpha [(\frac 1 m \sum_{i=1}^m(h_\theta(x^{(i)}) - y^{(i)}) + \frac \lambda m \theta_j] $
+    
+<p>  }</p>
+</blockquote>
+</li>
+<li><p>Regularized normal equation</p>
+<blockquote>
+<p>$ \theta = (X^TX+\lambda * L)^{-1}X^Ty $<br>L is a matrix with 0 at the top left and 1’s down the diagonal, with 0’s everywhere else.</p>
+</blockquote>
+</li>
+<li><p>Regularized logistic regression</p>
+<blockquote>
+  
+$ J(\theta) = - \frac 1 m \sum_{i=1}^m[y^{(i)}log(h_\theta(x^{(i)}))+(1-y^{(i)})log(1-h_\theta(x^{(i)}))] + \frac \lambda {2m} \sum_{j=1}^n\theta_j^2$
+    
+</blockquote>
+</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;机器学习-第三周&quot;&gt;&lt;a href=&quot;#机器学习-第三周&quot; class=&quot;headerlink&quot; title=&quot;机器学习 第三周&quot;&gt;&lt;/a&gt;机器学习 第三周&lt;/h2&gt;&lt;h3 id=&quot;Classification-and-Representation&quot;&gt;&lt;a hre
+    
+    </summary>
+    
+    
+      <category term="machinelearning" scheme="https://bournexian.github.io/tags/machinelearning/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>machinelearning-week2</title>
+    <link href="https://bournexian.github.io/2017/08/15/machinelearning-week2/"/>
+    <id>https://bournexian.github.io/2017/08/15/machinelearning-week2/</id>
+    <published>2017-08-15T12:43:22.000Z</published>
+    <updated>2017-08-26T05:04:40.012Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="机器学习-第二周"><a href="#机器学习-第二周" class="headerlink" title="机器学习 第二周"></a>机器学习 第二周</h2><p>下面是一些讲义的摘抄，以及一些学习笔记。<br>MathJax写公式上手还是比较容易的。</p>
+<h3 id="Linear-regression"><a href="#Linear-regression" class="headerlink" title="Linear regression"></a>Linear regression</h3><h4 id="Hypothesis"><a href="#Hypothesis" class="headerlink" title="Hypothesis:"></a>Hypothesis:</h4><p>$h_\theta(x) = \theta^Tx = \theta_0x_0 + \theta_1x_1 + ··· + \theta_nx_n$</p>
+<h4 id="Parameters"><a href="#Parameters" class="headerlink" title="Parameters:"></a>Parameters:</h4><p>$\theta_0,\theta_1…,\theta_n$</p>
+<h4 id="Cost-function"><a href="#Cost-function" class="headerlink" title="Cost function:"></a>Cost function:</h4>
+$J(\theta) = \frac 1 {2m} \sum_{i=1}^m (h_\theta(x^{(i)})-y^{(i)})^2$
+
+<h4 id="Gradient-descent"><a href="#Gradient-descent" class="headerlink" title="Gradient descent:"></a>Gradient descent:</h4><p>Repeat{<br>    $\theta_j := \theta_j - \alpha \frac \partial {\partial \theta_j}J(\theta)$<br>}</p>
+<h4 id="Feature-Scaling"><a href="#Feature-Scaling" class="headerlink" title="Feature Scaling:"></a>Feature Scaling:</h4><p>To make sure features are on a similar scale, so that it could be faster when do the gradient descent.</p>
+<h4 id="Mean-normalization"><a href="#Mean-normalization" class="headerlink" title="Mean normalization:"></a>Mean normalization:</h4><p>To make features have approximately zero mean.</p>
+<p>$x_i = \frac {x_i - \mu_i} {s_i}$</p>
+<p>$\mu_i$ is the average value of $x_i$ in traning set<br>$s_i$ is the range (max-min)  or (standard deviation)</p>
+<h4 id="Learning-rate"><a href="#Learning-rate" class="headerlink" title="Learning rate:"></a>Learning rate:</h4><p>It’s better to draw a graph for the value of $J(\theta)$. It it decrease after every iteration then it is good.<br>Otherwise, if it is slow convergence or value of cost function not decrease, consider to change the learning rate $\alpha$.</p>
+<p>Reference: <a href="https://www.coursera.org/learn/machine-learning" target="_blank" rel="external">https://www.coursera.org/learn/machine-learning</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;机器学习-第二周&quot;&gt;&lt;a href=&quot;#机器学习-第二周&quot; class=&quot;headerlink&quot; title=&quot;机器学习 第二周&quot;&gt;&lt;/a&gt;机器学习 第二周&lt;/h2&gt;&lt;p&gt;下面是一些讲义的摘抄，以及一些学习笔记。&lt;br&gt;MathJax写公式上手还是比较容易的。&lt;/
+    
+    </summary>
+    
+    
+      <category term="machinelearning" scheme="https://bournexian.github.io/tags/machinelearning/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>machinelearning_week1</title>
+    <link href="https://bournexian.github.io/2017/08/08/machinelearning-week1/"/>
+    <id>https://bournexian.github.io/2017/08/08/machinelearning-week1/</id>
+    <published>2017-08-08T02:50:41.000Z</published>
+    <updated>2017-08-26T05:04:40.012Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="机器学习-第一周"><a href="#机器学习-第一周" class="headerlink" title="机器学习 第一周"></a>机器学习 第一周</h2><p>上周试学了一下CS231n, 看了两三节课的视频发现数学基础以及其它基础的模型没有什么概念。<br>所以就先学习一下Coursera的机器学习课程.<br>Week1</p>
+<ul>
+<li>了解什么是机器学习，监督学习和非监督学习的概念。</li>
+<li>模型和成本函数</li>
+<li>线性代数基础</li>
+</ul>
+<p>每节还带有一些小测验和lecture notes，很好的公开课.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;机器学习-第一周&quot;&gt;&lt;a href=&quot;#机器学习-第一周&quot; class=&quot;headerlink&quot; title=&quot;机器学习 第一周&quot;&gt;&lt;/a&gt;机器学习 第一周&lt;/h2&gt;&lt;p&gt;上周试学了一下CS231n, 看了两三节课的视频发现数学基础以及其它基础的模型没有什么概念。
+    
+    </summary>
+    
+    
+      <category term="machinelearning" scheme="https://bournexian.github.io/tags/machinelearning/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Upload deleted file</title>
+    <link href="https://bournexian.github.io/2017/07/30/Upload-deleted-file/"/>
+    <id>https://bournexian.github.io/2017/07/30/Upload-deleted-file/</id>
+    <published>2017-07-30T02:36:00.000Z</published>
+    <updated>2017-08-26T05:04:40.010Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近在项目中遇到两个个问题，</p>
+<ol>
+<li>选择文件的时候做filter，只显示特定的文件类型。</li>
+<li>在input type 是file的时候，选择上传文件，然后再在文件系统里面删掉对应文件，接着点击上传。</li>
+</ol>
+<p>问题一，通过查API解决，HTML5 File API，通过accept 属性指定扩展名，表示服务器可接受的文件类型。<br>“.jpg,.png,.doc” 通过逗号分隔。</p>
+<p>问题二，这个在不同浏览器下面的behavior都不一样。</p>
+<p>在Chrome下面会上传失败，因为文件已经删除掉了。那么问题来了，有没办法在上传之前就先做检测判断文件是否存在呢？毕竟这样比catch上次失败的错误要好吧。<br>查了下，原来浏览器有安全策略，不会暴露完整的文件路径， 会转成”<strong>C:\fakepath\</strong>“。<br>后来发现可以通过size属性间接判断，因为删除文件后，file对象的size属性的值变成0了。</p>
+<p>在IE下面，input file选择了文件后，文件系统里面删除对应文件并不会把文件真正删除，所以上传还是会成功的。</p>
+<p>在Firefox，删除文件后，size属性的值没变，不像chrome那样把size变成0， 所以没法子使用这个属性判断。 目前还未想到有更好的方法处理？ 有待继续研究。。。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;最近在项目中遇到两个个问题，&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;选择文件的时候做filter，只显示特定的文件类型。&lt;/li&gt;
+&lt;li&gt;在input type 是file的时候，选择上传文件，然后再在文件系统里面删掉对应文件，接着点击上传。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;问题一，通过
+    
+    </summary>
+    
+    
+      <category term="Javascript" scheme="https://bournexian.github.io/tags/Javascript/"/>
+    
+  </entry>
+  
+</feed>
